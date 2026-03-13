@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Badge } from "@/components/ui/badge";
 import OrderItem from "@/components/ui/order-item";
 import { prismaClient } from "@/lib/prisma";
@@ -11,6 +13,9 @@ const OrdersPage = async () => {
           product: true,
         },
       },
+    },
+    orderBy: {
+      createdAt: "desc", // Os pedidos mais recentes vão ficar no topo da lista!
     },
   });
 

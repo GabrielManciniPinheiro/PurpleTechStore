@@ -53,7 +53,17 @@ const OrderItem = ({ order }: OrderItemProps) => {
                   Pedido com {order.orderProducts.length} produto(s)
                 </p>
                 <span className="text-xs opacity-60">
-                  Feito em {format(order.createdAt, "d/MM/y 'às' HH:mm")}
+                  Feito em{" "}
+                  {new Intl.DateTimeFormat("pt-BR", {
+                    timeZone: "America/Sao_Paulo",
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                    .format(order.createdAt)
+                    .replace(",", " às")}
                 </span>
               </div>
 
@@ -67,7 +77,12 @@ const OrderItem = ({ order }: OrderItemProps) => {
               <div className="hidden flex-1 lg:block">
                 <p className="text-xs font-bold lg:text-sm ">Data</p>
                 <p className="text-xs opacity-60 lg:text-sm">
-                  {format(order.createdAt, "d/MM/y")}
+                  {new Intl.DateTimeFormat("pt-BR", {
+                    timeZone: "America/Sao_Paulo",
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                  }).format(order.createdAt)}
                 </p>
               </div>
 
@@ -91,7 +106,12 @@ const OrderItem = ({ order }: OrderItemProps) => {
                 <div>
                   <p className="text-xs font-bold lg:text-sm">Data</p>
                   <p className="text-xs opacity-60 lg:text-sm">
-                    {format(order.createdAt, "d/MM/y")}
+                    {new Intl.DateTimeFormat("pt-BR", {
+                      timeZone: "America/Sao_Paulo",
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                    }).format(order.createdAt)}
                   </p>
                 </div>
 

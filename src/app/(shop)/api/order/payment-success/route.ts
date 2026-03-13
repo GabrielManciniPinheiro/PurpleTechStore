@@ -27,16 +27,17 @@ export const POST = async (request: Request) => {
   }
 
   if (event.type === "checkout.session.completed") {
-    // Usando 'any' para o TypeScript não encher o saco com o shipping_details
+    // Usando 'any' para o TypeScript não encher o saco
     const session = event.data.object as any;
 
-    // 📦 Capturando os dados de entrega nativos do Stripe
-    const shippingDetails = session.shipping_details?.address;
+    // 📦 Pega o endereço de Entrega. Se vier vazio, pega o de Cobrança.
+    const addressData =
+      session.shipping_details?.address || session.customer_details?.address;
 
     // Montando a rua + número + complemento (se houver)
-    const fullAddress = shippingDetails?.line1
-      ? `${shippingDetails.line1}${
-          shippingDetails.line2 ? ` - ${shippingDetails.line2}` : ""
+    const fullAddress = addressData?.line1
+      ? `${addressData.line1}${
+          addressData.line2 ? ` - ${addressData.line2}` : ""
         }`
       : null;
 
@@ -48,9 +49,9 @@ export const POST = async (request: Request) => {
       data: {
         status: "PAYMENT_CONFIRMED",
         address: fullAddress,
-        city: shippingDetails?.city,
-        state: shippingDetails?.state,
-        zipCode: shippingDetails?.postal_code,
+        city: addressData?.city || null,
+        state: addressData?.state || null,
+        zipCode: addressData?.postal_code || null,
       },
     });
   }

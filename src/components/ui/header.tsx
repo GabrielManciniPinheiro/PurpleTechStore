@@ -71,7 +71,7 @@ const Header = () => {
 
                 <div className="flex flex-col">
                   <p className="font-medium">{data.user.name}</p>
-                  <p className="text-sm opacity-75">Boas compras!</p>
+                  <p className="text-sm opacity-75">Seja Bem-Vindo!</p>
                 </div>
               </div>
 

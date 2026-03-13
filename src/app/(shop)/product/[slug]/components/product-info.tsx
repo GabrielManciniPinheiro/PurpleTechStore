@@ -4,7 +4,12 @@ import { Button } from "@/components/ui/button";
 import DiscountBadge from "@/components/ui/discount-badge";
 import { ProductWithTotalPrice } from "@/helpers/product";
 import { CartContext } from "@/providers/cart";
-import { ArrowLeftIcon, ArrowRightIcon, TruckIcon } from "lucide-react";
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  TruckIcon,
+  CheckCircle2,
+} from "lucide-react";
 import { useContext, useState } from "react";
 import WishButton from "./WishButton";
 import { WishList } from "@prisma/client";
@@ -17,9 +22,9 @@ interface ProductInfoProps {
   product: ProductWithTotalPriceAndWishLists;
 }
 
-const ProductInfo = ( { product } : ProductInfoProps) => {
-  console.log(product.wishLists);
+const ProductInfo = ({ product }: ProductInfoProps) => {
   const [quantity, setQuantity] = useState(1);
+  const [showAddedPopup, setShowAddedPopup] = useState(false);
 
   const { addProductToCart } = useContext(CartContext);
 
@@ -33,10 +38,38 @@ const ProductInfo = ( { product } : ProductInfoProps) => {
 
   const handleAddToCartClick = () => {
     addProductToCart({ ...product, quantity });
+
+    // Exibe o pop-up
+    setShowAddedPopup(true);
+
+    // Esconde o pop-up automaticamente após 3 segundos
+    setTimeout(() => {
+      setShowAddedPopup(false);
+    }, 1000);
   };
 
   return (
     <div className="flex flex-col px-5 lg:w-[40%] lg:rounded-lg lg:bg-accent lg:p-10">
+      {/* POP-UP CENTRALIZADO COM SUMIÇO AUTOMÁTICO */}
+      {showAddedPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-300">
+          <div className="flex flex-col items-center gap-4 rounded-xl border border-[#8162FF]/30 bg-[#1A1A1A] p-8 text-center shadow-2xl animate-in fade-in zoom-in-95">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#8162FF]/20">
+              <CheckCircle2 className="h-8 w-8 text-[#8162FF]" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-white">
+                Adicionado ao carrinho!
+              </h3>
+              <p className="mt-2 text-sm text-gray-300">
+                <span className="font-bold text-[#8162FF]">{quantity}x</span>{" "}
+                {product.name}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <h2 className="text-lg lg:text-2xl">{product.name}</h2>
 
       <div className="flex items-center gap-2">
@@ -82,7 +115,7 @@ const ProductInfo = ( { product } : ProductInfoProps) => {
       </div>
 
       <div className="mt-8 flex flex-col gap-5">
-        <WishButton productId={product.id} wishLists={product.wishLists}  />
+        <WishButton productId={product.id} wishLists={product.wishLists} />
 
         <Button className="font-bold uppercase" onClick={handleAddToCartClick}>
           Adicionar ao carrinho

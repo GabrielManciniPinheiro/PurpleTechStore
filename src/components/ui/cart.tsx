@@ -10,7 +10,7 @@ import { Button } from "./button";
 import { createCheckout } from "@/actions/checkout";
 import { loadStripe } from "@stripe/stripe-js";
 import { createOrder } from "@/actions/order";
-import { useSession } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 
 const Cart = () => {
   const { data } = useSession();
@@ -19,15 +19,15 @@ const Cart = () => {
 
   const handleFinishPurchaseClick = async () => {
     if (!data?.user) {
-      // TODO: redirecionar para o login
-      return;
+      // Redireciona o usuário para o fluxo de login
+      return signIn();
     }
 
     const order = await createOrder(products, (data?.user as any).id);
 
     const checkout = await createCheckout(products, order.id);
 
-    const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
+    const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
 
     // Criar pedido no banco
 

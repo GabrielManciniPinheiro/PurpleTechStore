@@ -7,7 +7,7 @@ export const createCheckout = async (
   products: CartProduct[],
   orderId: string,
 ) => {
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
     apiVersion: "2026-02-25.clover",
   });
 
@@ -19,6 +19,12 @@ export const createCheckout = async (
     metadata: {
       orderId,
     },
+
+    // 👇 ADICIONE ISTO AQUI: Habilita a coleta de endereço no Stripe (Apenas Brasil)
+    shipping_address_collection: {
+      allowed_countries: ["BR"],
+    },
+
     line_items: products.map((product) => {
       return {
         price_data: {

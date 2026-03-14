@@ -1,10 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["utfs.io"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "utfs.io",
+        port: "",
+        pathname: "/**",
+      },
+    ],
   },
   experimental: {
-    serverActions: true,
+    serverActions: true, // Devolvendo a vida pro seu checkout e pro nosso modal!
   },
 };
 

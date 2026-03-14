@@ -1,13 +1,14 @@
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { prismaClient } from "@/lib/prisma";
-import { PackageIcon, PlusIcon } from "lucide-react";
+import { PackageIcon } from "lucide-react";
 import ProductsTable, {
   ProductWithTotalPriceAndCategory,
 } from "./components/products-table";
 import { computeProductTotalPrice } from "@/helpers/product";
+import CreateProductDialog from "./components/create-product-dialog";
 
 const ProductsPage = async () => {
+  // 1. Busca os produtos como você já fazia
   const products = await prismaClient.product.findMany({
     include: {
       category: {
@@ -18,10 +19,18 @@ const ProductsPage = async () => {
     },
   });
 
+  // 2. Busca TODAS as categorias para preencher o Select do Modal
+  const categories = await prismaClient.category.findMany({
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+
   const productsWithTotalPrice: ProductWithTotalPriceAndCategory[] =
     products.map((product) => ({
       ...product,
-      totalPrice: computeProductTotalPrice(product),
+      totalPrice: computeProductTotalPrice(product as any),
     }));
 
   return (
@@ -36,10 +45,8 @@ const ProductsPage = async () => {
           Produtos encontrados: {products.length}
         </p>
 
-        <Button className="flex gap-2">
-          <PlusIcon size={18} />
-          Adicionar produto
-        </Button>
+        {/* 👇 O seu Modal super turbinado entra aqui! 👇 */}
+        <CreateProductDialog categories={categories} />
       </div>
 
       <ProductsTable products={productsWithTotalPrice} />

@@ -1,8 +1,8 @@
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { prismaClient } from "@/lib/prisma";
-import { ListOrderedIcon, PlusIcon } from "lucide-react";
+import { ListOrderedIcon } from "lucide-react";
 import CategoriesTable from "./components/categories-table";
+import CreateCategoryDialog from "./components/create-category-dialog";
 
 const CategoriesPage = async () => {
   const categories = await prismaClient.category.findMany({
@@ -27,10 +27,8 @@ const CategoriesPage = async () => {
           Categorias encontradas: {categories.length}
         </p>
 
-        <Button className="flex gap-2">
-          <PlusIcon size={18} />
-          Adicionar categoria
-        </Button>
+        {/* 👇 Substituímos o <Button> estático pelo nosso Modal Interativo 👇 */}
+        <CreateCategoryDialog />
       </div>
 
       <CategoriesTable categories={categories} />

@@ -20,7 +20,7 @@ export const createCheckout = async (
       orderId,
     },
 
-    // 👇 ADICIONE ISTO AQUI: Habilita a coleta de endereço no Stripe (Apenas Brasil)
+    // 👇 Habilita a coleta de endereço no Stripe (Apenas Brasil)
     shipping_address_collection: {
       allowed_countries: ["BR"],
     },

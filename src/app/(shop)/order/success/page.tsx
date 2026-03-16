@@ -4,21 +4,25 @@ import { CheckCircle2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Confetti from "react-confetti";
+import { CartContext } from "@/providers/cart";
 
 const SuccessPage = () => {
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
   const [showConfetti, setShowConfetti] = useState(true);
 
+  const { clearCart } = useContext(CartContext);
+
   useEffect(() => {
-    // Pega o tamanho da tela para o confete cobrir tudo
+    clearCart();
+
     setWindowSize({ width: window.innerWidth, height: window.innerHeight });
 
     // Para o confete depois de 8 segundos para não pesar o PC do usuário
     const timer = setTimeout(() => setShowConfetti(false), 8000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [clearCart]);
 
   return (
     <div className="relative flex h-full flex-col items-center justify-center p-5">

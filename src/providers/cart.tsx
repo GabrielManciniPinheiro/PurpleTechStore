@@ -1,7 +1,14 @@
 "use client";
 
 import { ProductWithTotalPrice } from "@/helpers/product";
-import { ReactNode, createContext, useEffect, useMemo, useState } from "react";
+import {
+  ReactNode,
+  createContext,
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+} from "react";
 
 export interface CartProduct extends ProductWithTotalPrice {
   quantity: number;
@@ -19,7 +26,6 @@ interface ICartContext {
   decreaseProductQuantity: (productId: string) => void;
   increaseProductQuantity: (productId: string) => void;
   removeProductFromCart: (productId: string) => void;
-  // 👇 Função nova adicionada aqui
   clearCart: () => void;
 }
 
@@ -35,108 +41,69 @@ export const CartContext = createContext<ICartContext>({
   decreaseProductQuantity: () => {},
   increaseProductQuantity: () => {},
   removeProductFromCart: () => {},
-  // 👇 Valor inicial da função
   clearCart: () => {},
 });
 
 const CartProvider = ({ children }: { children: ReactNode }) => {
   const [products, setProducts] = useState<CartProduct[]>([]);
 
-  useEffect(() => {
-    setProducts(
-      JSON.parse(localStorage.getItem("@fsw-store/cart-products") || "[]"),
+  // 👇 1. "Congelando" a função de limpar o carrinho para evitar loops
+  const clearCart = useCallback(() => {
+    setProducts([]);
+  }, []);
+
+  // 👇 2. "Congelando" as outras funções principais
+  const addProductToCart = useCallback((product: CartProduct) => {
+    setProducts((prev) => {
+      const productIsAlreadyOnCart = prev.some((p) => p.id === product.id);
+      if (productIsAlreadyOnCart) {
+        return prev.map((p) =>
+          p.id === product.id
+            ? { ...p, quantity: p.quantity + product.quantity }
+            : p,
+        );
+      }
+      return [...prev, product];
+    });
+  }, []);
+
+  const decreaseProductQuantity = useCallback((productId: string) => {
+    setProducts((prev) =>
+      prev
+        .map((p) =>
+          p.id === productId ? { ...p, quantity: p.quantity - 1 } : p,
+        )
+        .filter((p) => p.quantity > 0),
     );
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem("@fsw-store/cart-products", JSON.stringify(products));
-  }, [products]);
+  const increaseProductQuantity = useCallback((productId: string) => {
+    setProducts((prev) =>
+      prev.map((p) =>
+        p.id === productId ? { ...p, quantity: p.quantity + 1 } : p,
+      ),
+    );
+  }, []);
 
-  // Total sem descontos
+  const removeProductFromCart = useCallback((productId: string) => {
+    setProducts((prev) => prev.filter((p) => p.id !== productId));
+  }, []);
+
   const subtotal = useMemo(() => {
-    return products.reduce((acc, product) => {
-      return acc + Number(product.basePrice) * product.quantity;
-    }, 0);
+    return products.reduce(
+      (acc, product) => acc + Number(product.basePrice) * product.quantity,
+      0,
+    );
   }, [products]);
 
-  // Total com descontos
   const total = useMemo(() => {
-    return products.reduce((acc, product) => {
-      return acc + product.totalPrice * product.quantity;
-    }, 0);
+    return products.reduce(
+      (acc, product) => acc + product.totalPrice * product.quantity,
+      0,
+    );
   }, [products]);
 
   const totalDiscount = subtotal - total;
-
-  const addProductToCart = (product: CartProduct) => {
-    // se o produto já estiver no carrinho, apenas aumente a sua quantidade
-    const productIsAlreadyOnCart = products.some(
-      (cartProduct) => cartProduct.id === product.id,
-    );
-
-    if (productIsAlreadyOnCart) {
-      setProducts((prev) =>
-        prev.map((cartProduct) => {
-          if (cartProduct.id === product.id) {
-            return {
-              ...cartProduct,
-              quantity: cartProduct.quantity + product.quantity,
-            };
-          }
-
-          return cartProduct;
-        }),
-      );
-
-      return;
-    }
-
-    // se não, adicione o produto à lista
-    setProducts((prev) => [...prev, product]);
-  };
-
-  const decreaseProductQuantity = (productId: string) => {
-    setProducts((prev) =>
-      prev
-        .map((cartProduct) => {
-          if (cartProduct.id === productId) {
-            return {
-              ...cartProduct,
-              quantity: cartProduct.quantity - 1,
-            };
-          }
-
-          return cartProduct;
-        })
-        .filter((cartProduct) => cartProduct.quantity > 0),
-    );
-  };
-
-  const increaseProductQuantity = (productId: string) => {
-    setProducts((prev) =>
-      prev.map((cartProduct) => {
-        if (cartProduct.id === productId) {
-          return {
-            ...cartProduct,
-            quantity: cartProduct.quantity + 1,
-          };
-        }
-
-        return cartProduct;
-      }),
-    );
-  };
-
-  const removeProductFromCart = (productId: string) => {
-    setProducts((prev) =>
-      prev.filter((cartProduct) => cartProduct.id !== productId),
-    );
-  };
-
-  // 👇 A mágica acontece aqui: esvazia o array de produtos
-  const clearCart = () => {
-    setProducts([]);
-  };
 
   return (
     <CartContext.Provider
@@ -146,7 +113,7 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
         decreaseProductQuantity,
         increaseProductQuantity,
         removeProductFromCart,
-        clearCart, // 👇 Exportamos a função para o resto do site usar
+        clearCart,
         total,
         subtotal,
         totalDiscount,

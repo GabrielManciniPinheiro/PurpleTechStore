@@ -122,3 +122,11 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
+
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String   // Aqui vamos salvar a sua senha criptografada (nunca em texto limpo!)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

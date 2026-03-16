@@ -1,10 +1,9 @@
 import Categories from "./components/categories";
 import { prismaClient } from "@/lib/prisma";
-import ProductList from "../../../components/ui/product-list";
-import SectionTitle from "../../../components/ui/section-title";
 import PromoBanner from "./components/promo-banner";
-import Image from "next/image";
 import Link from "next/link";
+import ProductCarousel from "@/components/ui/product-carousel"; // 👇 Importando o carrossel novo
+import { computeProductTotalPrice } from "@/helpers/product"; // 👇 Importando a função de cálculo de preços
 
 export default async function Home() {
   const deals = await prismaClient.product.findMany({
@@ -31,6 +30,22 @@ export default async function Home() {
     },
   });
 
+  // 👇 Calculando o preço final de cada produto antes de mandar pro Carrossel
+  const dealsWithTotalPrice = deals.map((product) => ({
+    ...product,
+    totalPrice: computeProductTotalPrice(product as any),
+  }));
+
+  const keyboardsWithTotalPrice = keyboards.map((product) => ({
+    ...product,
+    totalPrice: computeProductTotalPrice(product as any),
+  }));
+
+  const mousesWithTotalPrice = mouses.map((product) => ({
+    ...product,
+    totalPrice: computeProductTotalPrice(product as any),
+  }));
+
   return (
     <>
       <div className="mx-auto max-w-[1920px]">
@@ -56,9 +71,9 @@ export default async function Home() {
           <Categories />
         </div>
 
+        {/* 👇 CARROSSEL 1: OFERTAS 👇 */}
         <div className="flex flex-col gap-3 lg:gap-5">
-          <SectionTitle className="pl-5">Ofertas</SectionTitle>
-          <ProductList products={deals} />
+          <ProductCarousel title="Ofertas" products={dealsWithTotalPrice} />
         </div>
 
         <div className="flex flex-col lg:flex-row">
@@ -79,9 +94,12 @@ export default async function Home() {
           </Link>
         </div>
 
+        {/* 👇 CARROSSEL 2: TECLADOS 👇 */}
         <div className="flex flex-col gap-3 lg:gap-5">
-          <SectionTitle className="pl-5">Teclados</SectionTitle>
-          <ProductList products={keyboards} />
+          <ProductCarousel
+            title="Teclados"
+            products={keyboardsWithTotalPrice}
+          />
         </div>
 
         <div>
@@ -102,9 +120,9 @@ export default async function Home() {
           </Link>
         </div>
 
+        {/* 👇 CARROSSEL 3: MOUSES 👇 */}
         <div className="flex flex-col gap-3 lg:gap-5">
-          <SectionTitle className="pl-5">Mouses</SectionTitle>
-          <ProductList products={mouses} />
+          <ProductCarousel title="Mouses" products={mousesWithTotalPrice} />
         </div>
       </div>
     </>

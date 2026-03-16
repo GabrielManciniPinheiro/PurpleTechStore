@@ -28,12 +28,11 @@ import Link from "next/link";
 import Cart from "./cart";
 import { useContext } from "react";
 import { CartContext } from "@/providers/cart";
+import Image from "next/image";
 
 const Header = () => {
   const { status, data } = useSession();
-
   const { products } = useContext(CartContext);
-
   const cartQuantityItems = products.length;
 
   const handleLoginClick = async () => {
@@ -45,10 +44,10 @@ const Header = () => {
   };
 
   return (
-    <Card className="flex items-center justify-between p-[1.875rem]">
+    <Card className="flex w-full items-center justify-between p-3 sm:p-5 md:p-[1.875rem]">
       <Sheet>
         <SheetTrigger asChild>
-          <Button size="icon">
+          <Button size="icon" className="shrink-0">
             <MenuIcon />
           </Button>
         </SheetTrigger>
@@ -65,7 +64,6 @@ const Header = () => {
                   <AvatarFallback>
                     {data.user.name?.[0].toUpperCase()}
                   </AvatarFallback>
-
                   {data.user.image && <AvatarImage src={data.user.image} />}
                 </Avatar>
 
@@ -74,7 +72,6 @@ const Header = () => {
                   <p className="text-sm opacity-75">Seja Bem-Vindo!</p>
                 </div>
               </div>
-
               <Separator />
             </div>
           )}
@@ -165,15 +162,28 @@ const Header = () => {
         </SheetContent>
       </Sheet>
 
-      <Link href="/">
-        <h1 className="text-lg font-semibold">
+      {/* 👇 Ajuste Mágico: flex-1 e justify-center centralizam perfeitamente */}
+      <Link
+        href="/"
+        className="flex min-w-0 flex-1 items-center justify-center gap-2 px-2 md:gap-3"
+      >
+        <Image
+          src="/PurpleTechLogo.png"
+          alt="PurpleTech Store Logo"
+          width={260}
+          height={260}
+          quality={100}
+          priority
+          className="h-[75px] w-[75px] shrink-0 object-contain"
+        />
+        <h1 className="truncate text-sm font-semibold sm:text-base md:text-lg">
           <span className="text-primary">PurpleTech</span> Store
         </h1>
       </Link>
 
       <Sheet>
         <SheetTrigger asChild>
-          <Button size="icon" className="relative">
+          <Button size="icon" className="relative shrink-0">
             {cartQuantityItems > 0 && (
               <span className="absolute right-[calc(-1.25rem/2)] top-[calc(-1.25rem/2)] flex h-6 w-6 items-center justify-center rounded-lg bg-secondary text-sm font-bold">
                 {cartQuantityItems}

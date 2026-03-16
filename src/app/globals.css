@@ -42,21 +42,21 @@
   }
   body {
     @apply h-full bg-background text-foreground;
+    /* Mata a rolagem horizontal acidental e esconde a barra no Firefox/Edge */
+    overflow-x: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
   html {
     @apply h-full;
+    /* Reforço para garantir que a página inteira obedeça */
+    overflow-x: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 }
 
+/* Esconde a barra definitivamente no Chrome, Safari e Opera */
 ::-webkit-scrollbar {
-  width: 0.45rem;
-}
-
-::-webkit-scrollbar-track {
-  background: #171717;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #5033c3;
-  border-radius: 999px;
+  display: none;
 }

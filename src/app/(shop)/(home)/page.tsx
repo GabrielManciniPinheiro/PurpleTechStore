@@ -5,6 +5,8 @@ import Link from "next/link";
 import ProductCarousel from "@/components/ui/product-carousel"; // 👇 Importando o carrossel novo
 import { computeProductTotalPrice } from "@/helpers/product"; // 👇 Importando a função de cálculo de preços
 
+export const revalidate = 0;
+
 export default async function Home() {
   const deals = await prismaClient.product.findMany({
     where: {

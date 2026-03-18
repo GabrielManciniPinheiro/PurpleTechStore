@@ -25,13 +25,16 @@ model Product {
   description        String
   basePrice          Decimal        @db.Decimal(8, 2)
   imageUrls          String[]
-  categoryId         String
-  category           Category       @relation(fields: [categoryId], references: [id])
+  
+  // 👇 Aqui estão as alterações para permitir produtos órfãos
+  categoryId         String?
+  category           Category?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  
   discountPercentage Int            @default(0)
   OrderProduct       OrderProduct[]
   wishLists          WishList[]     @relation("WishListProducts")
   
-  // 🚀 Campos Ocultos para Dropshipping
+  isActive           Boolean        @default(true)
   supplierUrl        String?
   costPrice          Decimal?       @db.Decimal(8, 2)
 }
@@ -96,9 +99,9 @@ model Session {
 }
 
 model User {
-  id            String     @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String?
-  email         String?    @unique
+  email         String?   @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]

@@ -8,9 +8,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ProductWithTotalPrice } from "@/helpers/product";
-import { EditIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { DeleteProductButton } from "./delete-product-button";
+import { EditProductButton } from "./edit-product-button"; // 👇 Nosso novo botão importado aqui!
 
 // 👇 Ajuste 1: Avisando o TypeScript que a categoria pode ser nula (produtos órfãos)
 export type ProductWithTotalPriceAndCategory = ProductWithTotalPrice & {
@@ -51,9 +50,8 @@ const ProductsTable = ({ products }: ProductsTableProps) => {
             <TableCell>0</TableCell>
 
             <TableCell className="flex gap-2">
-              <Button variant="outline" size="icon" title="Editar Produto">
-                <EditIcon size={16} />
-              </Button>
+              {/* 👇 O botão de editar real agora com os dados do produto! */}
+              <EditProductButton product={product} />
 
               <DeleteProductButton
                 productId={product.id}

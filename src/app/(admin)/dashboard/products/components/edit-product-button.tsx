@@ -1,114 +1,228 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { EditIcon, Loader2Icon, SaveIcon } from "lucide-react";
+import { EditIcon, Loader2Icon, SaveIcon, XIcon } from "lucide-react";
 import { useState, useTransition } from "react";
 import { updateProduct } from "./action";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import Image from "next/image";
 
-// Tipagem simplificada baseada no que vem da tabela
-interface EditProductButtonProps {
-  product: any;
-}
+// 👇 Importações nativas do UploadThing
+import { UploadDropzone } from "@uploadthing/react";
+import type { OurFileRouter } from "@/app/api/uploadthing/core";
 
-export const EditProductButton = ({ product }: EditProductButtonProps) => {
+export const EditProductButton = ({ product, categories }: any) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  // Função que captura os dados do formulário e manda para o banco
-  const handleAction = (formData: FormData) => {
+  // Estados
+  const [description, setDescription] = useState(product.description || "");
+  const [imageUrls, setImageUrls] = useState<string[]>(product.imageUrls || []);
+  const [categoryId, setCategoryId] = useState(
+    product.categoryId || "sem_categoria",
+  );
+  const [isActive, setIsActive] = useState(product.isActive ?? true);
+
+  // Função para remover uma imagem da lista antes de salvar
+  const handleRemoveImage = (indexToRemove: number) => {
+    setImageUrls((prev) => prev.filter((_, index) => index !== indexToRemove));
+  };
+
+  const handleSave = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+
     startTransition(async () => {
       await updateProduct({
         id: product.id,
         name: formData.get("name") as string,
-        slug: product.slug, // Mantemos o slug original para não quebrar links
-        description: product.description, // Mantemos a descrição original
+        slug: product.slug,
+        description: description,
         basePrice: Number(formData.get("basePrice")),
         discountPercentage: Number(formData.get("discountPercentage")),
-        categoryId: product.categoryId,
-        imageUrls: product.imageUrls,
-        supplierUrl: product.supplierUrl,
-        costPrice: product.costPrice ? Number(product.costPrice) : undefined,
+        categoryId: categoryId === "sem_categoria" ? null : categoryId,
+        imageUrls: imageUrls, // 👇 Aqui vai o array de imagens (antigas + novas do UploadThing)
+        isActive: isActive,
+        supplierUrl: product.supplierUrl || null,
+        costPrice: product.costPrice ? Number(product.costPrice) : null,
       });
 
-      setIsOpen(false); // Fecha a aba lateral quando terminar de salvar
+      setIsOpen(false);
     });
   };
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetTrigger asChild>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
         <Button variant="outline" size="icon" title="Editar Produto">
           <EditIcon size={16} />
         </Button>
-      </SheetTrigger>
+      </DialogTrigger>
 
-      <SheetContent className="border-zinc-800 bg-zinc-950 text-white sm:max-w-[400px]">
-        <SheetHeader>
-          <SheetTitle className="text-white">Editar Produto</SheetTitle>
-        </SheetHeader>
+      <DialogContent className="max-h-[90vh] overflow-y-auto border-zinc-800 bg-zinc-950 text-white sm:max-w-[600px]">
+        <DialogHeader>
+          <DialogTitle>Editar Produto</DialogTitle>
+        </DialogHeader>
 
-        <form action={handleAction} className="mt-8 flex flex-col gap-6">
+        <form onSubmit={handleSave} className="mt-4 flex flex-col gap-6">
+          {/* Switch de Ativo/Inativo */}
+          <div className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
+            <Label className="cursor-pointer text-base font-semibold">
+              Produto Ativo na Loja
+            </Label>
+            <Switch checked={isActive} onCheckedChange={setIsActive} />
+          </div>
+
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold text-zinc-300">
-              Nome do Produto
-            </label>
+            <Label>Nome do Produto</Label>
             <Input
               name="name"
               defaultValue={product.name}
               required
-              className="border-zinc-700 bg-zinc-900 focus-visible:ring-primary"
+              className="border-zinc-800 bg-zinc-900"
             />
           </div>
 
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold text-zinc-300">
-              Preço Base (R$)
-            </label>
-            <Input
-              name="basePrice"
-              type="number"
-              step="0.01" // Permite centavos
-              defaultValue={Number(product.basePrice)}
-              required
-              className="border-zinc-700 bg-zinc-900 focus-visible:ring-primary"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">
+              <Label>Preço Base (R$)</Label>
+              <Input
+                name="basePrice"
+                type="number"
+                step="0.01"
+                defaultValue={Number(product.basePrice)}
+                required
+                className="border-zinc-800 bg-zinc-900"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label>Desconto (%)</Label>
+              <Input
+                name="discountPercentage"
+                type="number"
+                defaultValue={product.discountPercentage}
+                required
+                className="border-zinc-800 bg-zinc-900"
+              />
+            </div>
           </div>
 
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold text-zinc-300">
-              Desconto (%)
-            </label>
-            <Input
-              name="discountPercentage"
-              type="number"
-              defaultValue={product.discountPercentage}
+            <Label>Categoria</Label>
+            <Select value={categoryId} onValueChange={setCategoryId}>
+              <SelectTrigger className="border-zinc-800 bg-zinc-900">
+                <SelectValue placeholder="Selecione a categoria" />
+              </SelectTrigger>
+              <SelectContent className="border-zinc-800 bg-zinc-900 text-white">
+                <SelectItem value="sem_categoria">Sem Categoria</SelectItem>
+                {categories?.map((cat: any) => (
+                  <SelectItem key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label>Descrição</Label>
+            <Textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               required
-              className="border-zinc-700 bg-zinc-900 focus-visible:ring-primary"
+              className="min-h-[100px] border-zinc-800 bg-zinc-900"
+            />
+          </div>
+
+          {/* 👇 GERENCIADOR DE IMAGENS COM UPLOADTHING 👇 */}
+          <div className="flex flex-col gap-3 rounded-lg border border-zinc-800 bg-zinc-900/30 p-4">
+            <Label className="font-semibold text-zinc-300">
+              Imagens do Produto
+            </Label>
+
+            {/* 1. Galeria de Imagens Atuais */}
+            {imageUrls.length > 0 && (
+              <div className="mb-2 flex flex-wrap gap-3">
+                {imageUrls.map((url, index) => (
+                  <div
+                    key={index}
+                    className="relative h-[80px] w-[80px] overflow-hidden rounded-md border border-zinc-700 bg-zinc-950"
+                  >
+                    <Image
+                      src={url}
+                      alt={`Imagem ${index + 1}`}
+                      fill
+                      className="object-contain"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveImage(index)}
+                      className="absolute right-1 top-1 rounded-full bg-red-600/90 p-1 text-white transition-colors hover:bg-red-600"
+                      title="Remover imagem"
+                    >
+                      <XIcon size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* 2. Área de Upload de Novas Imagens */}
+            <UploadDropzone<OurFileRouter, "imageUploader">
+              endpoint="imageUploader" // ⚠️ ATENÇÃO: Verifique se o nome do seu endpoint no core.ts é esse mesmo!
+              onClientUploadComplete={(res) => {
+                // Pega as URLs das imagens que acabaram de subir e adiciona na lista
+                if (res) {
+                  setImageUrls((prev) => [
+                    ...prev,
+                    ...res.map((file) => file.url),
+                  ]);
+                }
+              }}
+              onUploadError={(error: Error) => {
+                alert(`Erro ao subir a imagem: ${error.message}`);
+              }}
+              appearance={{
+                container: "border-zinc-800 bg-zinc-950 p-4",
+                label: "text-zinc-400 hover:text-primary transition-colors",
+                button:
+                  "bg-primary text-white hover:bg-primary/90 ut-readying:bg-primary/50",
+                allowedContent: "text-zinc-500",
+              }}
             />
           </div>
 
           <Button
             type="submit"
             disabled={isPending}
-            className="mt-4 w-full gap-2 bg-primary font-bold hover:bg-primary/90"
+            className="mt-2 w-full bg-primary font-bold hover:bg-primary/90"
           >
             {isPending ? (
-              <Loader2Icon className="animate-spin" size={16} />
+              <Loader2Icon className="mr-2 animate-spin" size={16} />
             ) : (
-              <SaveIcon size={16} />
+              <SaveIcon className="mr-2" size={16} />
             )}
             {isPending ? "Salvando..." : "Salvar Alterações"}
           </Button>
         </form>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   );
 };

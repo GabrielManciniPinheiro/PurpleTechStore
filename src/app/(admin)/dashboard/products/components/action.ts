@@ -40,11 +40,12 @@ export const updateProduct = async (data: {
   slug: string;
   description: string;
   basePrice: number;
-  categoryId: string;
+  categoryId: string | null; // 👇 Ajustado para aceitar null (Produto Órfão)
   discountPercentage: number;
   imageUrls: string[];
-  supplierUrl?: string;
-  costPrice?: number;
+  supplierUrl?: string | null;
+  costPrice?: number | null;
+  isActive: boolean; // 👇 Novo campo adicionado para o botão de Switch!
 }) => {
   await prismaClient.product.update({
     where: { id: data.id },
@@ -58,6 +59,7 @@ export const updateProduct = async (data: {
       imageUrls: data.imageUrls,
       supplierUrl: data.supplierUrl || null,
       costPrice: data.costPrice || null,
+      isActive: data.isActive, // 👇 Salvando o status de ativo/inativo no banco
     },
   });
 

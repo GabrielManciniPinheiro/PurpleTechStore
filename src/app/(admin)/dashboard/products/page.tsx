@@ -8,7 +8,7 @@ import { computeProductTotalPrice } from "@/helpers/product";
 import CreateProductDialog from "./components/create-product-dialog";
 
 const ProductsPage = async () => {
-  // 1. Busca os produtos como você já fazia
+  // 1. Busca os produtos
   const products = await prismaClient.product.findMany({
     include: {
       category: {
@@ -45,11 +45,14 @@ const ProductsPage = async () => {
           Produtos encontrados: {products.length}
         </p>
 
-        {/* 👇 O seu Modal super turbinado entra aqui! 👇 */}
         <CreateProductDialog categories={categories} />
       </div>
 
-      <ProductsTable products={productsWithTotalPrice} />
+      {/* 👇 O SEGREDO ESTAVA AQUI: Passando as categorias para a tabela repassar pro botão! */}
+      <ProductsTable
+        products={productsWithTotalPrice}
+        categories={categories}
+      />
     </div>
   );
 };

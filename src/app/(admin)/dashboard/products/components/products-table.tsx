@@ -1,7 +1,6 @@
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -9,20 +8,27 @@ import {
 } from "@/components/ui/table";
 import { ProductWithTotalPrice } from "@/helpers/product";
 import { DeleteProductButton } from "./delete-product-button";
-import { EditProductButton } from "./edit-product-button"; // 👇 Nosso novo botão importado aqui!
+import { EditProductButton } from "./edit-product-button"; // 👇 O nosso botão!
 
-// 👇 Ajuste 1: Avisando o TypeScript que a categoria pode ser nula (produtos órfãos)
+// 👇 Avisando o TypeScript todos os campos que existem no produto
 export type ProductWithTotalPriceAndCategory = ProductWithTotalPrice & {
   category: {
     name: string;
   } | null;
+  description: string;
+  imageUrls: string[];
+  categoryId: string | null;
+  isActive: boolean;
+  supplierUrl: string | null;
+  costPrice: any;
 };
 
 interface ProductsTableProps {
   products: ProductWithTotalPriceAndCategory[];
+  categories: any[]; // 👇 A tabela agora recebe as categorias para repassar ao botão
 }
 
-const ProductsTable = ({ products }: ProductsTableProps) => {
+const ProductsTable = ({ products, categories }: ProductsTableProps) => {
   return (
     <Table>
       <TableHeader>
@@ -31,7 +37,7 @@ const ProductsTable = ({ products }: ProductsTableProps) => {
           <TableHead>Categoria</TableHead>
           <TableHead>Preço total</TableHead>
           <TableHead>Preço base</TableHead>
-          <TableHead>Vendidos</TableHead>
+          <TableHead>Status</TableHead>
           <TableHead>Ações</TableHead>
         </TableRow>
       </TableHeader>
@@ -40,18 +46,25 @@ const ProductsTable = ({ products }: ProductsTableProps) => {
           <TableRow key={product.id}>
             <TableCell>{product.name}</TableCell>
 
-            {/* 👇 Ajuste 2: Se a categoria existir mostra o nome, senão mostra "Sem Categoria" */}
             <TableCell>{product.category?.name || "Sem Categoria"}</TableCell>
 
             <TableCell>R$ {product.totalPrice.toFixed(2)}</TableCell>
 
             <TableCell>R$ {Number(product.basePrice).toFixed(2)}</TableCell>
 
-            <TableCell>0</TableCell>
+            <TableCell>
+              {product.isActive ? (
+                <span className="text-xs font-bold text-emerald-500">
+                  Ativo
+                </span>
+              ) : (
+                <span className="text-xs font-bold text-red-500">Inativo</span>
+              )}
+            </TableCell>
 
             <TableCell className="flex gap-2">
-              {/* 👇 O botão de editar real agora com os dados do produto! */}
-              <EditProductButton product={product} />
+              {/* 👇 O Botão de Editar recebendo tudo redondinho */}
+              <EditProductButton product={product} categories={categories} />
 
               <DeleteProductButton
                 productId={product.id}

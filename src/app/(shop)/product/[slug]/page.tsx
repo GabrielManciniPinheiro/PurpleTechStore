@@ -50,10 +50,13 @@ const ProductDetailsPage = async ({
         />
       </div>
 
-      <div className="flex flex-col gap-5">
-        <SectionTitle className="pl-5">Produtos Recomendados</SectionTitle>
-        <ProductList products={product.category.products} />
-      </div>
+      {/* 👇 O AJUSTE ESTÁ AQUI: Só renderiza a seção se a categoria não for nula */}
+      {product.category && (
+        <div className="flex flex-col gap-5">
+          <SectionTitle className="pl-5">Produtos Recomendados</SectionTitle>
+          <ProductList products={product.category.products} />
+        </div>
+      )}
     </div>
   );
 };

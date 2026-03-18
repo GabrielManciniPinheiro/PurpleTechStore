@@ -13,7 +13,8 @@ interface WishlistItemProps {
 const WishlistItem = ({ product }: WishlistItemProps) => {
   return (
     <div className="flex flex-col gap-4">
-      <div className="relative flex aspect-square h-40 w-40 rounded-lg bg-accent">
+      {/* 👇 O ajuste cirúrgico foi aqui: adicionei items-center justify-center */}
+      <div className="relative flex aspect-square h-40 w-40 items-center justify-center rounded-lg bg-accent">
         <Image
           src={product.imageUrls[0]}
           height={0}

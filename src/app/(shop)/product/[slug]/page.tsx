@@ -5,6 +5,7 @@ import { computeProductTotalPrice } from "@/helpers/product";
 import ProductList from "@/components/ui/product-list";
 import SectionTitle from "@/components/ui/section-title";
 
+export const revalidate = 0;
 interface ProductDetailsPageProps {
   params: {
     slug: string;

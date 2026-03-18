@@ -10,12 +10,13 @@ import {
 import { ProductWithTotalPrice } from "@/helpers/product";
 import { EditIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DeleteProductButton } from "./delete-product-button"; // 👇 Importando nosso novo botão!
+import { DeleteProductButton } from "./delete-product-button";
 
+// 👇 Ajuste 1: Avisando o TypeScript que a categoria pode ser nula (produtos órfãos)
 export type ProductWithTotalPriceAndCategory = ProductWithTotalPrice & {
   category: {
     name: string;
-  };
+  } | null;
 };
 
 interface ProductsTableProps {
@@ -32,7 +33,7 @@ const ProductsTable = ({ products }: ProductsTableProps) => {
           <TableHead>Preço total</TableHead>
           <TableHead>Preço base</TableHead>
           <TableHead>Vendidos</TableHead>
-          <TableHead>Ações</TableHead> {/* 👇 Nova coluna adicionada */}
+          <TableHead>Ações</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -40,7 +41,8 @@ const ProductsTable = ({ products }: ProductsTableProps) => {
           <TableRow key={product.id}>
             <TableCell>{product.name}</TableCell>
 
-            <TableCell>{(product as any).category.name}</TableCell>
+            {/* 👇 Ajuste 2: Se a categoria existir mostra o nome, senão mostra "Sem Categoria" */}
+            <TableCell>{product.category?.name || "Sem Categoria"}</TableCell>
 
             <TableCell>R$ {product.totalPrice.toFixed(2)}</TableCell>
 
@@ -48,7 +50,6 @@ const ProductsTable = ({ products }: ProductsTableProps) => {
 
             <TableCell>0</TableCell>
 
-            {/* 👇 Célula de Ações com os botões */}
             <TableCell className="flex gap-2">
               <Button variant="outline" size="icon" title="Editar Produto">
                 <EditIcon size={16} />

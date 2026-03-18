@@ -111,7 +111,7 @@ const Footer = () => {
             <div className="flex gap-4 text-zinc-400">
               <div className="flex flex-col items-center gap-1">
                 <CreditCardIcon size={32} />
-                <span className="text-[10px] uppercase">Crédito | Débito</span>
+                <span className="text-[10px] uppercase">Crédito | Débito </span>
               </div>
               <div className="flex flex-col items-center gap-1">
                 <SmartphoneNfcIcon size={32} />

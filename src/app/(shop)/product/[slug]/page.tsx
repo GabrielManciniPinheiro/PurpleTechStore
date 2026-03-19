@@ -2,8 +2,10 @@ import { prismaClient } from "@/lib/prisma";
 import ProductImages from "./components/product-images";
 import ProductInfo from "./components/product-info";
 import { computeProductTotalPrice } from "@/helpers/product";
-import ProductList from "@/components/ui/product-list";
 import SectionTitle from "@/components/ui/section-title";
+
+// 👇 IMPORTANTE: Trocamos o import do ProductList pelo seu ProductCarousel
+import ProductCarousel from "@/components/ui/product-carousel";
 
 export const revalidate = 0;
 interface ProductDetailsPageProps {
@@ -18,6 +20,7 @@ const ProductDetailsPage = async ({
   const product = await prismaClient.product.findFirst({
     where: {
       slug: slug,
+      isActive: true,
     },
     include: {
       category: {
@@ -27,6 +30,7 @@ const ProductDetailsPage = async ({
               slug: {
                 not: slug,
               },
+              isActive: true,
             },
           },
         },
@@ -41,21 +45,22 @@ const ProductDetailsPage = async ({
 
   return (
     <div className="flex flex-col gap-8 pb-8 lg:container lg:mx-auto lg:gap-10 lg:py-10">
-      <div className="flex flex-col gap-8 lg:flex-row lg:gap-9  lg:px-5">
+      <div className="flex flex-col gap-8 lg:flex-row lg:gap-9 lg:px-5">
         <ProductImages imageUrls={product.imageUrls} name={product.name} />
         <ProductInfo
           product={{
             ...product,
-            totalPrice: computeProductTotalPrice(product),
+            totalPrice: computeProductTotalPrice(product as any),
           }}
         />
       </div>
 
-      {/* 👇 O AJUSTE ESTÁ AQUI: Só renderiza a seção se a categoria não for nula */}
       {product.category && (
         <div className="flex flex-col gap-5">
-          <SectionTitle className="pl-5">Produtos Recomendados</SectionTitle>
-          <ProductList products={product.category.products} />
+          <ProductCarousel
+            title="Produtos Recomendados"
+            products={product.category.products as any}
+          />
         </div>
       )}
     </div>

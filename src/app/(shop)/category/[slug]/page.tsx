@@ -10,7 +10,11 @@ const CategoryProducts = async ({ params }: any) => {
       slug: params.slug,
     },
     include: {
-      products: true,
+      products: {
+        where: {
+          isActive: true, // 👇 Filtra os produtos inativos dentro da categoria
+        },
+      },
     },
   });
 
@@ -31,7 +35,7 @@ const CategoryProducts = async ({ params }: any) => {
             key={product.id}
             product={{
               ...product,
-              totalPrice: computeProductTotalPrice(product),
+              totalPrice: computeProductTotalPrice(product as any),
             }}
           />
         ))}

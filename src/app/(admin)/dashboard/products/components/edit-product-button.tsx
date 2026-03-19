@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { EditIcon, Loader2Icon, SaveIcon, XIcon } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { updateProduct } from "./action";
 import {
   Dialog,
@@ -23,8 +23,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Image from "next/image";
-
-// 👇 Importações nativas do UploadThing
 import { UploadDropzone } from "@uploadthing/react";
 import type { OurFileRouter } from "@/app/api/uploadthing/core";
 
@@ -32,7 +30,7 @@ export const EditProductButton = ({ product, categories }: any) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  // Estados
+  // Estados locais
   const [description, setDescription] = useState(product.description || "");
   const [imageUrls, setImageUrls] = useState<string[]>(product.imageUrls || []);
   const [categoryId, setCategoryId] = useState(
@@ -40,7 +38,17 @@ export const EditProductButton = ({ product, categories }: any) => {
   );
   const [isActive, setIsActive] = useState(product.isActive ?? true);
 
-  // Função para remover uma imagem da lista antes de salvar
+  // 👇 O SEGREDO 1: Sempre que o modal abrir, nós forçamos o React a limpar a memória
+  // e pegar os dados exatos do produto que foi clicado agora.
+  useEffect(() => {
+    if (isOpen) {
+      setDescription(product.description || "");
+      setImageUrls(product.imageUrls || []);
+      setCategoryId(product.categoryId || "sem_categoria");
+      setIsActive(product.isActive ?? true);
+    }
+  }, [isOpen, product]);
+
   const handleRemoveImage = (indexToRemove: number) => {
     setImageUrls((prev) => prev.filter((_, index) => index !== indexToRemove));
   };
@@ -58,7 +66,7 @@ export const EditProductButton = ({ product, categories }: any) => {
         basePrice: Number(formData.get("basePrice")),
         discountPercentage: Number(formData.get("discountPercentage")),
         categoryId: categoryId === "sem_categoria" ? null : categoryId,
-        imageUrls: imageUrls, // 👇 Aqui vai o array de imagens (antigas + novas do UploadThing)
+        imageUrls: imageUrls,
         isActive: isActive,
         supplierUrl: product.supplierUrl || null,
         costPrice: product.costPrice ? Number(product.costPrice) : null,
@@ -78,21 +86,29 @@ export const EditProductButton = ({ product, categories }: any) => {
 
       <DialogContent className="max-h-[90vh] overflow-y-auto border-zinc-800 bg-zinc-950 text-white sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Editar Produto</DialogTitle>
+          <DialogTitle>Editar Produto: {product.name}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSave} className="mt-4 flex flex-col gap-6">
-          {/* Switch de Ativo/Inativo */}
+          {/* 👇 O SEGREDO 2: IDs únicos usando o product.id para não dar conflito */}
           <div className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
-            <Label className="cursor-pointer text-base font-semibold">
+            <Label
+              htmlFor={`status-${product.id}`}
+              className="cursor-pointer text-base font-semibold"
+            >
               Produto Ativo na Loja
             </Label>
-            <Switch checked={isActive} onCheckedChange={setIsActive} />
+            <Switch
+              id={`status-${product.id}`}
+              checked={isActive}
+              onCheckedChange={setIsActive}
+            />
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label>Nome do Produto</Label>
+            <Label htmlFor={`name-${product.id}`}>Nome do Produto</Label>
             <Input
+              id={`name-${product.id}`}
               name="name"
               defaultValue={product.name}
               required
@@ -102,8 +118,9 @@ export const EditProductButton = ({ product, categories }: any) => {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-2">
-              <Label>Preço Base (R$)</Label>
+              <Label htmlFor={`basePrice-${product.id}`}>Preço Base (R$)</Label>
               <Input
+                id={`basePrice-${product.id}`}
                 name="basePrice"
                 type="number"
                 step="0.01"
@@ -113,8 +130,9 @@ export const EditProductButton = ({ product, categories }: any) => {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label>Desconto (%)</Label>
+              <Label htmlFor={`discount-${product.id}`}>Desconto (%)</Label>
               <Input
+                id={`discount-${product.id}`}
                 name="discountPercentage"
                 type="number"
                 defaultValue={product.discountPercentage}
@@ -142,8 +160,9 @@ export const EditProductButton = ({ product, categories }: any) => {
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label>Descrição</Label>
+            <Label htmlFor={`description-${product.id}`}>Descrição</Label>
             <Textarea
+              id={`description-${product.id}`}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required
@@ -151,13 +170,11 @@ export const EditProductButton = ({ product, categories }: any) => {
             />
           </div>
 
-          {/* 👇 GERENCIADOR DE IMAGENS COM UPLOADTHING 👇 */}
           <div className="flex flex-col gap-3 rounded-lg border border-zinc-800 bg-zinc-900/30 p-4">
             <Label className="font-semibold text-zinc-300">
               Imagens do Produto
             </Label>
 
-            {/* 1. Galeria de Imagens Atuais */}
             {imageUrls.length > 0 && (
               <div className="mb-2 flex flex-wrap gap-3">
                 {imageUrls.map((url, index) => (
@@ -184,11 +201,9 @@ export const EditProductButton = ({ product, categories }: any) => {
               </div>
             )}
 
-            {/* 2. Área de Upload de Novas Imagens */}
             <UploadDropzone<OurFileRouter, "imageUploader">
-              endpoint="imageUploader" // ⚠️ ATENÇÃO: Verifique se o nome do seu endpoint no core.ts é esse mesmo!
+              endpoint="imageUploader"
               onClientUploadComplete={(res) => {
-                // Pega as URLs das imagens que acabaram de subir e adiciona na lista
                 if (res) {
                   setImageUrls((prev) => [
                     ...prev,

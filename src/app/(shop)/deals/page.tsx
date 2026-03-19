@@ -7,6 +7,7 @@ import { PercentIcon } from "lucide-react";
 const DealsPage = async () => {
   const deals = await prismaClient.product.findMany({
     where: {
+      isActive: true, // 👇 Não exibe produtos em oferta que foram inativados
       discountPercentage: {
         gt: 0,
       },
@@ -26,7 +27,7 @@ const DealsPage = async () => {
             key={product.id}
             product={{
               ...product,
-              totalPrice: computeProductTotalPrice(product),
+              totalPrice: computeProductTotalPrice(product as any),
             }}
           />
         ))}

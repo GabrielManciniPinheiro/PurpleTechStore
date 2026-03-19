@@ -1,12 +1,9 @@
 "use client";
 
-import { Button } from "@/components/ui/button"; // Verifique se o caminho do seu Button é esse mesmo
+import { Button } from "@/components/ui/button";
 import { TrashIcon, Loader2Icon } from "lucide-react";
-import { useTransition } from "react";
-import { deleteProduct } from "./action";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -14,7 +11,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"; // Verifique se o caminho do seu AlertDialog é esse
+} from "@/components/ui/alert-dialog";
+import { useTransition, useState } from "react";
+import { deleteProduct } from "./action";
 
 interface DeleteProductButtonProps {
   productId: string;
@@ -25,53 +24,59 @@ export const DeleteProductButton = ({
   productId,
   productName,
 }: DeleteProductButtonProps) => {
-  // useTransition é perfeito para Server Actions: ele gerencia o estado de "loading" automaticamente
+  const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  const handleDelete = () => {
+  const handleConfirmDelete = () => {
     startTransition(async () => {
+      // Aqui garantimos que ele só manda o ID isolado deste componente
       await deleteProduct(productId);
-      // Como tem o revalidatePath na Action, a tabela vai atualizar sozinha assim que isso terminar!
+      setIsOpen(false);
     });
   };
 
   return (
-    <AlertDialog>
+    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
-        <Button
-          variant="destructive"
-          size="icon"
-          title="Inativar Produto"
-          disabled={isPending}
-        >
-          {isPending ? (
-            <Loader2Icon className="animate-spin" size={16} />
-          ) : (
-            <TrashIcon size={16} />
-          )}
+        <Button variant="outline" size="icon" title="Inativar Produto">
+          <TrashIcon
+            size={16}
+            className="text-red-500 transition-colors hover:text-red-600"
+          />
         </Button>
       </AlertDialogTrigger>
 
-      <AlertDialogContent className="border-zinc-800 bg-zinc-900 text-white">
+      <AlertDialogContent className="border-zinc-800 bg-zinc-950 text-white">
         <AlertDialogHeader>
-          <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+          <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
           <AlertDialogDescription className="text-zinc-400">
-            Esta ação vai inativar o produto{" "}
-            <strong className="text-white">{productName}</strong>. Ele sumirá da
-            vitrine da loja imediatamente, mas o histórico de pedidos antigos
-            será preservado.
+            Isso irá inativar o produto{" "}
+            <strong className="text-white">{productName}</strong>. Ele deixará
+            de aparecer na loja imediatamente, mas continuará no seu banco de
+            dados.
           </AlertDialogDescription>
         </AlertDialogHeader>
+
         <AlertDialogFooter>
-          <AlertDialogCancel className="border-none bg-zinc-800 text-white hover:bg-zinc-700">
+          <AlertDialogCancel
+            disabled={isPending}
+            className="border-zinc-800 bg-zinc-900 text-white hover:bg-zinc-800"
+          >
             Cancelar
           </AlertDialogCancel>
-          <AlertDialogAction
-            onClick={handleDelete}
-            className="bg-red-600 text-white hover:bg-red-700"
+          <Button
+            variant="destructive"
+            onClick={handleConfirmDelete}
+            disabled={isPending}
+            className="gap-2 font-bold"
           >
-            Sim, inativar produto
-          </AlertDialogAction>
+            {isPending ? (
+              <Loader2Icon className="animate-spin" size={16} />
+            ) : (
+              <TrashIcon size={16} />
+            )}
+            {isPending ? "Inativando..." : "Sim, Inativar Produto"}
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

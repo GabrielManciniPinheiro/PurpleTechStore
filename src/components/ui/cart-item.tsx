@@ -30,16 +30,15 @@ const CartItem = ({ product }: CartItemProps) => {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-4">
-        {/* PARTE DIREITA (FOTO E NOME) */}
-
-        <div className="flex h-[77px] w-[77px] items-center justify-center rounded-lg bg-accent lg:h-[120px] lg:w-[120px]">
+        {/* 👇 O SEGREDO 1: relative, shrink-0 (anti-esmagamento) e overflow-hidden */}
+        <div className="relative flex h-[77px] w-[77px] shrink-0 items-center justify-center overflow-hidden rounded-lg bg-accent lg:h-[120px] lg:w-[120px]">
+          {/* 👇 O SEGREDO 2: 'fill' e 'object-contain' com padding igual na vitrine */}
           <Image
             src={product.imageUrls[0]}
-            width={0}
-            height={0}
-            sizes="100vw"
+            fill
+            sizes="(max-width: 768px) 77px, 120px"
             alt={product.name}
-            className="h-auto max-h-[70%] w-auto max-w-[80%]"
+            className="object-contain p-2 lg:p-3"
           />
         </div>
 

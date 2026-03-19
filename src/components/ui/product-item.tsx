@@ -15,13 +15,14 @@ const ProductItem = ({ product, className }: ProductItemProps) => {
       href={`/product/${product.slug}`}
       className={cn("flex min-w-[156px] flex-col gap-4", className)}
     >
-      <div className="relative flex aspect-square w-full items-center justify-center rounded-lg bg-accent">
+      {/* 👇 Adicionamos overflow-hidden para blindar a caixa */}
+      <div className="relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-lg bg-accent">
+        {/* 👇 O segredo: usamos 'fill' para a imagem obedecer a caixa, e 'p-5' para dar aquele respiro nas bordas */}
         <Image
           src={product.imageUrls[0]}
-          height={0}
-          width={0}
-          sizes="100vw"
-          className="h-auto max-h-[70%] w-auto max-w-[80%] object-contain"
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-contain p-5"
           alt={product.name}
         />
 

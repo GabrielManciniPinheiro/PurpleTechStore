@@ -1,5 +1,9 @@
 "use server";
 
+revalidatePath("/dashboard/categories"); // Atualiza a tabela de categorias
+revalidatePath("/dashboard/products"); // 👇 O SEGREDO: Atualiza o Select nos modais de Produto!
+revalidatePath("/catalog");
+
 import { prismaClient } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 

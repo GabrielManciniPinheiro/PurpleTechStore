@@ -33,8 +33,21 @@ const ProductsPage = async () => {
       totalPrice: computeProductTotalPrice(product as any),
     }));
 
+  // 👇 A MÁGICA DO AGRUPAMENTO: Separando os produtos pelas suas categorias
+  const groupedProducts = productsWithTotalPrice.reduce(
+    (acc, product) => {
+      const categoryName = product.category?.name || "Sem Categoria";
+      if (!acc[categoryName]) {
+        acc[categoryName] = [];
+      }
+      acc[categoryName].push(product);
+      return acc;
+    },
+    {} as Record<string, ProductWithTotalPriceAndCategory[]>,
+  );
+
   return (
-    <div className="flex w-full flex-col gap-10 p-10">
+    <div className="flex h-full w-full flex-col gap-10 overflow-y-auto p-10 pb-24">
       <Badge variant="heading">
         <PackageIcon size={18} />
         Produtos
@@ -42,17 +55,35 @@ const ProductsPage = async () => {
 
       <div className="flex w-full items-center justify-between">
         <p className="text-lg font-bold">
-          Produtos encontrados: {products.length}
+          Total de Produtos: {products.length}
         </p>
 
         <CreateProductDialog categories={categories} />
       </div>
 
-      {/* 👇 O SEGREDO ESTAVA AQUI: Passando as categorias para a tabela repassar pro botão! */}
-      <ProductsTable
-        products={productsWithTotalPrice}
-        categories={categories}
-      />
+      {/* 👇 Renderizando as categorias e suas respectivas tabelas! */}
+      <div className="flex flex-col gap-12">
+        {Object.entries(groupedProducts).map(
+          ([categoryName, categoryProducts]) => (
+            <div key={categoryName} className="flex flex-col gap-4">
+              {/* Título da Categoria */}
+              <h2 className="flex items-center gap-3 border-b border-zinc-800 pb-2 text-2xl font-bold text-white">
+                {categoryName}
+                <span className="text-sm font-normal text-zinc-500">
+                  ({categoryProducts.length}{" "}
+                  {categoryProducts.length === 1 ? "produto" : "produtos"})
+                </span>
+              </h2>
+
+              {/* Tabela apenas com os produtos desta categoria */}
+              <ProductsTable
+                products={categoryProducts}
+                categories={categories}
+              />
+            </div>
+          ),
+        )}
+      </div>
     </div>
   );
 };

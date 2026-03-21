@@ -4,6 +4,8 @@ import { computeProductTotalPrice } from "@/helpers/product";
 import { prismaClient } from "@/lib/prisma";
 import { PercentIcon } from "lucide-react";
 
+export const revalidate = 60;
+
 const DealsPage = async () => {
   const deals = await prismaClient.product.findMany({
     where: {

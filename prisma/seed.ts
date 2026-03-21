@@ -4,6 +4,9 @@ const prisma = new PrismaClient();
 
 async function main() {
   try {
+    // ==========================================
+    // 1. MOUSES (100% ORIGINAIS)
+    // ==========================================
     const mousesCategory = await prisma.category.create({
       data: {
         name: "Mouses",
@@ -27,7 +30,7 @@ async function main() {
         ],
         basePrice: 650,
         categoryId: mousesCategory.id,
-        discountPercentage: 10, // 10% discount
+        discountPercentage: 10,
       },
       {
         name: "Logitech Pro X Superlight",
@@ -42,7 +45,7 @@ async function main() {
         ],
         basePrice: 750,
         categoryId: mousesCategory.id,
-        discountPercentage: 5, // 5% discount
+        discountPercentage: 5,
       },
       {
         name: "Logitech G305 Lightspeed",
@@ -57,7 +60,7 @@ async function main() {
         ],
         basePrice: 300,
         categoryId: mousesCategory.id,
-        discountPercentage: 15, // 15% discount
+        discountPercentage: 15,
       },
       {
         name: "Hyperx Pulsefire Dart",
@@ -72,7 +75,7 @@ async function main() {
         ],
         basePrice: 600,
         categoryId: mousesCategory.id,
-        discountPercentage: 10, // 10% discount
+        discountPercentage: 10,
       },
       {
         name: "Razer Deathadder V2 Pro",
@@ -90,11 +93,11 @@ async function main() {
         discountPercentage: 0,
       },
     ];
+    await prisma.product.createMany({ data: mouses });
 
-    await prisma.product.createMany({
-      data: mouses,
-    });
-
+    // ==========================================
+    // 2. TECLADOS (TODOS OS ORIGINAIS + NOVOS)
+    // ==========================================
     const keyboardsCategory = await prisma.category.create({
       data: {
         name: "Teclados",
@@ -118,7 +121,7 @@ async function main() {
         ],
         basePrice: 650,
         categoryId: keyboardsCategory.id,
-        discountPercentage: 10, // 10% discount
+        discountPercentage: 10,
       },
       {
         name: "Logitech MX Keys S",
@@ -133,7 +136,7 @@ async function main() {
         ],
         basePrice: 750,
         categoryId: keyboardsCategory.id,
-        discountPercentage: 10, // 10% discount
+        discountPercentage: 10,
       },
       {
         name: "Logitech Pop Keys",
@@ -148,7 +151,7 @@ async function main() {
         ],
         basePrice: 440,
         categoryId: keyboardsCategory.id,
-        discountPercentage: 5, // 10% discount
+        discountPercentage: 5,
       },
       {
         name: "Logitech MX Mechanical",
@@ -158,12 +161,12 @@ async function main() {
         imageUrls: [
           "https://utfs.io/f/1c84b35c-a523-4ec5-afab-07717bfb3bc0-tbfuuf.png",
           "https://utfs.io/f/125ccdc0-9845-43cc-ade4-31dab27d8815-fsmt9h.png",
-          "https://utfs.io/f/125ccdc0-9845-43cc-ade4-31dab27d8815-fsmt9h.png",
+          "https://utfs.io/f/125ccdc0-9845-43cc-ade4-31dab27d8815-fsmt9h.png", // Imagem repetida do seu seed original mantida
           "https://utfs.io/f/2646c695-127e-43c7-b9e6-8785ae04d775-918ah0.png",
         ],
         basePrice: 700,
         categoryId: keyboardsCategory.id,
-        discountPercentage: 15, // 10% discount
+        discountPercentage: 15,
       },
       {
         name: "Epomaker TH80",
@@ -178,7 +181,7 @@ async function main() {
         ],
         basePrice: 500,
         categoryId: keyboardsCategory.id,
-        discountPercentage: 5, // 10% discount
+        discountPercentage: 5,
       },
       {
         name: "Redragon Gamer Ashe",
@@ -193,14 +196,42 @@ async function main() {
         ],
         basePrice: 400,
         categoryId: keyboardsCategory.id,
-        discountPercentage: 25, // 10% discount
+        discountPercentage: 25,
+      },
+      {
+        name: "Teclado Mecânico Gamer RGB Xtrike-ME GK-989B Switch Red ANSI Compacto",
+        slug: "teclado-mecanico-gamer-rgb-xtrike-me-gk-989b",
+        description:
+          "Mais precisão e velocidade para jogos competitivos com conforto e resposta suave.\n\nO Teclado Mecânico Gamer RGB Xtrike-ME GK-989B com Switch Red é a escolha ideal para quem busca desempenho, conforto e custo-benefício no universo gamer. Seu layout compacto de 87 teclas no padrão ANSI oferece mais espaço para movimentação do mouse.\n\nPrincipais características:\n• Switch Red: toque suave, rápido e silencioso\n• Layout compacto com 87 teclas\n• Iluminação RGB com 12 modos dinâmicos\n• Sistema antighosting com suporte a até 25 teclas simultâneas\n• Alta durabilidade: até 50 milhões de cliques\n• Conexão USB 2.0 rápida e estável",
+        imageUrls: [
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQi3HcqfH98zpkvOrWNQaFETLSghbX1mqsflIHy",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQicGiyCStPKN18Tmze5w0SQoYIZ9XEcJh3gF6q",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQi47yt2VctGeFDcpS1Jv0P2XCqHUIZoMQ7RTgw",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQioRpszM5TtzmLorGkvcO9SBAYby5ij1M3lUuJ",
+        ],
+        basePrice: 250,
+        categoryId: keyboardsCategory.id,
+        discountPercentage: 5,
+      },
+      {
+        name: "Teclado Gamer Iluminado Branco Lehmox LEY-2085 Semi Mecânico RGB USB",
+        slug: "teclado-gamer-iluminado-branco-lehmox-ley-2085",
+        description:
+          "Estilo e desempenho para elevar seu setup gamer com conforto e iluminação RGB.\n\nO Teclado Gamer Iluminado Branco Lehmox LEY-2085 é uma excelente escolha para quem busca um teclado gamer bonito, funcional e com ótimo custo-benefício. Com design moderno e acabamento na cor branca, ele se destaca no setup.\n\nPrincipais características:\n• Teclas semi mecânicas com resposta rápida\n• Iluminação RGB Rainbow com efeito vibrante\n• Design moderno na cor branca\n• Estrutura resistente em ABS\n• Alta durabilidade: até 10 milhões de cliques\n• Conexão USB plug and play",
+        imageUrls: [
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQizjIDf90M7cegw4EXUtT5OWBmAyvuFxldq31J",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQioGHw8N5TtzmLorGkvcO9SBAYby5ij1M3lUuJ",
+        ],
+        basePrice: 180,
+        categoryId: keyboardsCategory.id,
+        discountPercentage: 0,
       },
     ];
+    await prisma.product.createMany({ data: keyboards });
 
-    await prisma.product.createMany({
-      data: keyboards,
-    });
-
+    // ==========================================
+    // 3. FONES (TODOS OS ORIGINAIS + NOVOS)
+    // ==========================================
     const headphonesCategory = await prisma.category.create({
       data: {
         name: "Fones",
@@ -224,7 +255,7 @@ async function main() {
         ],
         basePrice: 750,
         categoryId: headphonesCategory.id,
-        discountPercentage: 10, // 10% discount
+        discountPercentage: 10,
       },
       {
         name: "Logitech Pro X 2 Lightspeed",
@@ -239,7 +270,7 @@ async function main() {
         ],
         basePrice: 1200,
         categoryId: headphonesCategory.id,
-        discountPercentage: 5, // 10% discount
+        discountPercentage: 5,
       },
       {
         name: "Logitech Astro A30",
@@ -254,7 +285,7 @@ async function main() {
         ],
         basePrice: 1500,
         categoryId: headphonesCategory.id,
-        discountPercentage: 15, // 10% discount
+        discountPercentage: 15,
       },
       {
         name: "Logitech Zone Wired Earbuds",
@@ -269,7 +300,7 @@ async function main() {
         ],
         basePrice: 550,
         categoryId: headphonesCategory.id,
-        discountPercentage: 5, // 10% discount
+        discountPercentage: 5,
       },
       {
         name: "Hyperx Cloud Stinger 2",
@@ -284,7 +315,7 @@ async function main() {
         ],
         basePrice: 250,
         categoryId: headphonesCategory.id,
-        discountPercentage: 0, // 10% discount
+        discountPercentage: 0,
       },
       {
         name: "Razer Kraken X",
@@ -299,14 +330,81 @@ async function main() {
         ],
         basePrice: 200,
         categoryId: headphonesCategory.id,
-        discountPercentage: 0, // 10% discount
+        discountPercentage: 0,
+      },
+      {
+        name: "Headset Gamer RGB Xtrike-ME GH-712 Over-Ear com Microfone e Fio P2 3.5mm",
+        slug: "headset-gamer-rgb-xtrike-me-gh-712",
+        description:
+          "Som imersivo e comunicação clara para elevar sua experiência nos jogos.\n\nEquipado com drivers de 50mm, ele oferece uma experiência sonora imersiva, com graves profundos e agudos nítidos. Seu design over-ear proporciona melhor isolamento acústico.\n\nPrincipais características:\n• Drivers de 50mm: graves potentes e áudio detalhado\n• Microfone com captação clara e redução de ruído\n• Iluminação LED RGB para um setup mais estiloso\n• Conexão P2 3.5mm compatível com diversos dispositivos",
+        imageUrls: [
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQiMyk05V4QnUD49todGuPe0SXTYrm7L5Fjqaxp",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQiYmASDo7kMaWHw7ERYnCo09ztrVqINdXQyKul",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQiDgodEyxF7SJrl8EY2WvxZunemqGXDRgAI4o5",
+        ],
+        basePrice: 199,
+        categoryId: headphonesCategory.id,
+        discountPercentage: 10,
+      },
+      {
+        name: "Headset Gamer RGB Xtrike-ME GH-509 Estéreo com Microfone P2 3.5mm para PC",
+        slug: "headset-gamer-rgb-xtrike-me-gh-509",
+        description:
+          "Som potente, comunicação clara e visual RGB para uma experiência gamer completa.\n\nEquipado com drivers de 50mm, ele oferece áudio estéreo potente. O microfone omnidirecional integrado garante comunicação eficiente com sua equipe.\n\nPrincipais características:\n• Drivers de 50mm com graves potentes\n• Som estéreo imersivo para jogos\n• Iluminação RGB para um setup mais moderno\n• Conexões P2 3.5mm + USB (LED)",
+        imageUrls: [
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQiLoqTHtiMNxWlY1Hfoh70bSjwadrF32mGzCU6",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQiItSB6YvRTzAnCWcBgyktuVD8pPO0ZGY1rHvw",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQi4VbZ6uctGeFDcpS1Jv0P2XCqHUIZoMQ7RTgw",
+        ],
+        basePrice: 150,
+        categoryId: headphonesCategory.id,
+        discountPercentage: 0,
+      },
+      {
+        name: "Fone de Ouvido Gamer RGB Lehmox Hyper GT LEF-1209 com Microfone USB Vermelho",
+        slug: "fone-gamer-rgb-lehmox-hyper-gt-lef-1209",
+        description:
+          "Imersão sonora, conforto e iluminação LED para elevar sua experiência nos jogos.\n\nDesenvolvido para oferecer uma experiência sonora imersiva, ele proporciona áudio estéreo com boa definição. Seu microfone integrado garante comunicação clara.\n\nPrincipais características:\n• Som estéreo com boa definição\n• Microfone integrado\n• Iluminação LED RGB\n• Conexão USB prática e estável",
+        imageUrls: [
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQi19iiiAwtjXJWas3LTNDG8CgbQEVBZ4hk1UY6",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQi0ZQ9IiOTfcYxjtXF38nlHkWCNRd72A45ui6v",
+        ],
+        basePrice: 130,
+        categoryId: headphonesCategory.id,
+        discountPercentage: 0,
+      },
+      {
+        name: "Fone de Ouvido Gamer RGB Lehmox Hyper GT LEF-1209 com Microfone USB Azul",
+        slug: "fone-gamer-rgb-lehmox-hyper-gt-lef-1209",
+        description:
+          "Imersão sonora, conforto e iluminação LED para elevar sua experiência nos jogos.\n\nDesenvolvido para oferecer uma experiência sonora imersiva, ele proporciona áudio estéreo com boa definição. Seu microfone integrado garante comunicação clara.\n\nPrincipais características:\n• Som estéreo com boa definição\n• Microfone integrado\n• Iluminação LED RGB\n• Conexão USB prática e estável",
+        imageUrls: [
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQiYFQuOc7kMaWHw7ERYnCo09ztrVqINdXQyKul",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQiawiw7fZ4btg1wrpihDsNCj20TldA958LFfx3",
+        ],
+        basePrice: 130,
+        categoryId: headphonesCategory.id,
+        discountPercentage: 0,
+      },
+      {
+        name: "Headset Gamer RGB Xtrike-ME GH-606 Estéreo com Microfone P2 3.5mm",
+        slug: "headset-gamer-rgb-xtrike-me-gh-606",
+        description:
+          "Som imersivo, comunicação clara e estilo RGB para elevar sua gameplay.\n\nCom som estéreo de alta definição, ele proporciona uma experiência imersiva. Seu microfone omnidirecional garante comunicação clara e eficiente.\n\nPrincipais características:\n• Som estéreo com áudio claro e envolvente\n• Microfone omnidirecional com captação precisa\n• Iluminação RGB\n• Conexão P2 3.5mm + USB (LED)",
+        imageUrls: [
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQif3XbKcrBbXR0O9zP5Ktq8igFj7sD1VJ3vNkG",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQif9TK3SrBbXR0O9zP5Ktq8igFj7sD1VJ3vNkG",
+        ],
+        basePrice: 160,
+        categoryId: headphonesCategory.id,
+        discountPercentage: 5,
       },
     ];
+    await prisma.product.createMany({ data: headphones });
 
-    await prisma.product.createMany({
-      data: headphones,
-    });
-
+    // ==========================================
+    // 4. MOUSEPADS (TODOS OS ORIGINAIS + NOVOS)
+    // ==========================================
     const mousepadsCategory = await prisma.category.create({
       data: {
         name: "Mousepads",
@@ -330,7 +428,7 @@ async function main() {
         ],
         basePrice: 950,
         categoryId: mousepadsCategory.id,
-        discountPercentage: 10, // 10% discount
+        discountPercentage: 10,
       },
       {
         name: "Logitech Desk Mat",
@@ -345,7 +443,7 @@ async function main() {
         ],
         basePrice: 150,
         categoryId: mousepadsCategory.id,
-        discountPercentage: 0, // 10% discount
+        discountPercentage: 0,
       },
       {
         name: "Logitech G740",
@@ -360,7 +458,7 @@ async function main() {
         ],
         basePrice: 200,
         categoryId: mousepadsCategory.id,
-        discountPercentage: 5, // 10% discount
+        discountPercentage: 5,
       },
       {
         name: "Logitech Mousepad Studio Series",
@@ -375,7 +473,7 @@ async function main() {
         ],
         basePrice: 250,
         categoryId: mousepadsCategory.id,
-        discountPercentage: 15, // 10% discount
+        discountPercentage: 15,
       },
       {
         name: "Force One Skyhawk Dark",
@@ -390,7 +488,7 @@ async function main() {
         ],
         basePrice: 300,
         categoryId: mousepadsCategory.id,
-        discountPercentage: 10, // 10% discount
+        discountPercentage: 10,
       },
       {
         name: "Force One Skyhawk Snow",
@@ -405,14 +503,226 @@ async function main() {
         ],
         basePrice: 300,
         categoryId: mousepadsCategory.id,
-        discountPercentage: 5, // 10% discount
+        discountPercentage: 5,
+      },
+      {
+        name: "Mouse Pad Gamer Extra Grande Cyberpunk 880x400mm Antiderrapante SP-004",
+        slug: "mouse-pad-gamer-extra-grande-cyberpunk-sp-004",
+        description:
+          "Mais espaço, precisão e estilo para elevar o nível do seu setup gamer.\n\nO Mouse Pad Gamer Extra Grande Cyberpunk 880x400mm SP-004 é a escolha perfeita para quem deseja melhorar a performance nos jogos e ainda deixar o setup com um visual impactante.\n\nPrincipais características:\n• Tamanho extra grande: 880x400mm\n• Superfície de tecido premium para alta precisão\n• Base emborrachada antiderrapante\n• Estampa cyberpunk moderna",
+        imageUrls: [
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQi5Z1br7mp6EXyL2A9vQ7TJ3HkVeUZsaOuIKi4",
+        ],
+        basePrice: 89,
+        categoryId: mousepadsCategory.id,
+        discountPercentage: 0,
+      },
+      {
+        name: "Mouse Pad Gamer Speed Extra Grande 700x350mm Exbom MP-7035C17 Antiderrapante",
+        slug: "mouse-pad-gamer-speed-asa-do-vulcao-exbom",
+        description:
+          "Precisão e velocidade para jogos com mais controle e estabilidade.\n\nSua superfície speed foi desenvolvida para garantir deslizamento rápido e preciso, sendo perfeita para jogos competitivos. Base emborrachada antiderrapante.\n\nPrincipais características:\n• Tamanho grande: 700x350x3mm\n• Superfície speed para movimentos rápidos\n• Bordas com costura reforçada em nylon\n• Design moderno 'Asa do Vulcão'",
+        imageUrls: [
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQivSgFYy5il4ckKjZtgxVoXy8fTUAQOaHPhp13",
+        ],
+        basePrice: 65,
+        categoryId: mousepadsCategory.id,
+        discountPercentage: 0,
+      },
+      {
+        name: "Mouse Pad Gamer Speed Extra Grande 700x350mm Rei Leão Broadway Exbom MP-7035C40",
+        slug: "mouse-pad-gamer-speed-rei-leao-broadway-exbom",
+        description:
+          "Velocidade, precisão e um design marcante para destacar seu setup.\n\nSuperfície speed desenvolvida para garantir deslizamento rápido e consistente. Base emborrachada antiderrapante que mantém o mouse pad firme na mesa.\n\nPrincipais características:\n• Tamanho extra grande: 700x350x3mm\n• Superfície speed para movimentos rápidos e precisos\n• Bordas reforçadas com costura em nylon\n• Estampa exclusiva 'Rei Leão Broadway'",
+        imageUrls: [
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQidMIe9jgCcB3KG17UDeOJtF4Sj0TlZYLHWxEM",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQixoMSksEWZQkEpSBbdu9nAIGNiCmfO4PcKe0j",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQim6402McJoz5RjDc3TaspJFiK4wUqB7CZ0r1h",
+        ],
+        basePrice: 65,
+        categoryId: mousepadsCategory.id,
+        discountPercentage: 5,
+      },
+      {
+        name: "Mouse Pad Gamer Extra Grande 900x400mm Dragão de Fogo Exbom MP-9040A01 Antiderrapante",
+        slug: "mouse-pad-gamer-extra-grande-dragao-de-fogo",
+        description:
+          "Máxima área, controle absoluto e um design impactante para seu setup gamer.\n\nCom dimensões amplas de 900x400mm, oferece espaço suficiente para teclado e mouse. Superfície em tecido premium otimizada para speed e controle.\n\nPrincipais características:\n• Tamanho extra grande: 900x400x3mm\n• Superfície otimizada para speed e controle\n• Bordas costuradas para maior durabilidade\n• Estampa exclusiva 'Dragão de Fogo'",
+        imageUrls: [
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQivSgFYy5il4ckKjZtgxVoXy8fTUAQOaHPhp13",
+        ],
+        basePrice: 99,
+        categoryId: mousepadsCategory.id,
+        discountPercentage: 10,
+      },
+      {
+        name: "Mouse Pad Gamer Extra Grande 700x350mm League of legends Exbom MP-7035C10 Antiderrapante",
+        slug: "mouse-pad-gamer-extra-grande-league-of-legends",
+        description:
+          "Mais controle, espaço e estilo para dominar suas partidas.\n\nSua superfície em tecido sintético foi desenvolvida para oferecer deslizamento suave e controle preciso. A base em borracha texturizada mantém o pad firme na mesa.\n\nPrincipais características:\n• Tamanho extra grande: 700x350x3mm\n• Superfície em tecido sintético de alta precisão\n• Bordas reforçadas com costura em nylon\n• Design exclusivo 'Liga dos Lendários'",
+        imageUrls: [
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQisEfi47VDZxcbpIm2ktuQhKlqRUFGiVj13zD4",
+        ],
+        basePrice: 75,
+        categoryId: mousepadsCategory.id,
+        discountPercentage: 0,
       },
     ];
+    await prisma.product.createMany({ data: mousepads });
 
-    await prisma.product.createMany({
-      data: mousepads,
+    // ==========================================
+    // 5. GABINETES (NOVOS)
+    // ==========================================
+    const gabinetesCategory = await prisma.category.create({
+      data: {
+        name: "Gabinetes",
+        slug: "gabinetes",
+        imageUrl:
+          "https://utfs.io/f/b73c526a-9e78-444e-8822-7cda6e857b9f-e7tkoj.png", // Ícone genérico provisório
+      },
     });
 
+    const gabinetes = [
+      {
+        name: "Gabinete Gamer Micro ATX Branco Nebula Mini MetalRed M6 Vidro Temperado Sem Fans",
+        slug: "gabinete-gamer-micro-atx-branco-nebula-mini",
+        description:
+          "Design compacto, elegante e pronto para setups de alta performance.\n\nCom design minimalista e acabamento premium, ele se destaca pelo visual moderno, com lateral e frente em vidro temperado.\n\nPrincipais características:\n• Compatível com placas-mãe Micro ATX (mATX)\n• Lateral e frontal em vidro temperado\n• Suporte para até 5 fans de 120mm\n• Compatível com water cooler de até 240mm\n• Não acompanha fans",
+        imageUrls: [
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQiSmN8iLBHNA0hmLyUxEvXgfZ5tVBRlp3C2cT1",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQiXh0n8duhwQrjLYmeSM5vlATfW6ZI2UuKEspi",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQiigQbIwq1aDfCvFXSGU0cyP6KpbuIWkQeiO8Z",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQioGEsDt5TtzmLorGkvcO9SBAYby5ij1M3lUuJ",
+        ],
+        basePrice: 350,
+        categoryId: gabinetesCategory.id,
+        discountPercentage: 10,
+      },
+      {
+        name: "Gabinete Gamer Micro ATX Branco Neptune Mini MetalRed M4 Vidro Temperado Sem Fans",
+        slug: "gabinete-gamer-micro-atx-branco-neptune-mini",
+        description:
+          "Alta performance, design premium e máximo aproveitamento de espaço.\n\nCom acabamento premium na cor branca e laterais em vidro temperado, proporciona um visual sofisticado.\n\nPrincipais características:\n• Compatível com placas-mãe Micro ATX (mATX)\n• Suporte para até 7 fans de 120mm\n• Lateral e frontal em vidro temperado\n• Excelente gerenciamento de cabos",
+        imageUrls: [
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQi9ZF4BWIdDELFO5UsQygmaXVoCxhetbrzv8NR",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQieKWavTfUUuwocMrHtbNSCGz3FRAqD9Pl15yZ",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQiBmbMxrBoEZf1n40vFXJqamlTDLQ59PjHzKdA",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQi3QORr398zpkvOrWNQaFETLSghbX1mqsflIHy",
+        ],
+        basePrice: 380,
+        categoryId: gabinetesCategory.id,
+        discountPercentage: 5,
+      },
+      {
+        name: "Gabinete Gamer Micro ATX Branco Stellar Pro MetalRed M9 Vidro Temperado Sem Fans",
+        slug: "gabinete-gamer-micro-atx-branco-stellar-pro",
+        description:
+          "Máximo espaço, airflow avançado e design premium.\n\nSeu amplo espaço interno permite a instalação de placas de vídeo de grande porte e diversos componentes de alto desempenho.\n\nPrincipais características:\n• Suporte para até 9 fans de 120mm\n• Compatível com water cooler de até 360mm\n• Lateral e frontal em vidro temperado\n• Espaço interno amplo para GPUs de grande porte",
+        imageUrls: [
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQiu6H8AU1MquD9FtZrE1CYXQid2B7kVcbJOon8",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQi5AHBvkmp6EXyL2A9vQ7TJ3HkVeUZsaOuIKi4",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQimKblxlJoz5RjDc3TaspJFiK4wUqB7CZ0r1hG",
+        ],
+        basePrice: 450,
+        categoryId: gabinetesCategory.id,
+        discountPercentage: 0,
+      },
+      {
+        name: "Gabinete Gamer Micro ATX Preto Stellar Pro MetalRed M9 Vidro Temperado Sem Fans",
+        slug: "gabinete-gamer-micro-atx-preto-stellar-pro",
+        description:
+          "Máximo desempenho, espaço interno e design premium para setups avançados.\n\nAcabamento em preto fosco e painéis em vidro temperado, oferece um visual imponente e sofisticado.\n\nPrincipais características:\n• Suporte para até 9 fans de 120mm\n• Compatível com water cooler de até 360mm\n• Lateral e frontal em vidro temperado\n• Estrutura resistente com acabamento preto fosco",
+        imageUrls: [
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQiO8SSmHXVxclWdeDK91L4BUQoPtmGwv3JFIYu",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQi8Az3VwlVAU5hyt4us6cmzKbkWBST3dO8xYgj",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQi98Ugt0IdDELFO5UsQygmaXVoCxhetbrzv8NR",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQiaA3ywIZ4btg1wrpihDsNCj20TldA958LFfx3",
+        ],
+        basePrice: 450,
+        categoryId: gabinetesCategory.id,
+        discountPercentage: 15,
+      },
+      {
+        name: "Gabinete Gamer Mid Tower Mymax Vulcano Preto USB 3.0 Vidro Temperado ATX",
+        slug: "gabinete-gamer-mid-tower-mymax-vulcano-preto",
+        description:
+          "Espaço, compatibilidade e design gamer para montar seu setup completo.\n\nCom suporte para placas-mãe ATX, Micro ATX e ITX, ele oferece flexibilidade para diferentes configurações.\n\nPrincipais características:\n• Formato Mid Tower com amplo espaço interno\n• Lateral em vidro temperado\n• Painel frontal com USB 3.0\n• Suporte para GPU de até 290mm",
+        imageUrls: [
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQifvQ6xtrBbXR0O9zP5Ktq8igFj7sD1VJ3vNkG",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQi0xnXzWOTfcYxjtXF38nlHkWCNRd72A45ui6v",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQi2LkopvbXydMOfugiCjzR0IWpP75T8GVaZvB9",
+        ],
+        basePrice: 320,
+        categoryId: gabinetesCategory.id,
+        discountPercentage: 0,
+      },
+      {
+        name: "Gabinete Gamer Mid Tower Mymax Cronus Preto RGB USB 3.0 Vidro Temperado ATX",
+        slug: "gabinete-gamer-mid-tower-mymax-cronus-preto-rgb",
+        description:
+          "Design moderno com iluminação RGB e espaço ideal para montar seu setup.\n\nSeu design robusto com painel frontal em LED RGB proporciona um visual gamer marcante, enquanto a lateral em vidro temperado exibe o interior.\n\nPrincipais características:\n• Compatível com placas-mãe ATX, Micro ATX e ITX\n• Painel frontal com iluminação LED RGB\n• Lateral em vidro temperado\n• Filtro de poeira superior",
+        imageUrls: [
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQiZyvWX4LvGwrS58EPjlsAMHQUIuRyfbod4FLh",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQiB7ghdBoEZf1n40vFXJqamlTDLQ59PjHzKdAy",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQiqPbdkQCQnIa2GUuVHNhOMzEBixL3Atde5Z0K",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQiU87m266GpOPTSzxfKg9ANFCdVbDqR6GwIaLi",
+        ],
+        basePrice: 360,
+        categoryId: gabinetesCategory.id,
+        discountPercentage: 5,
+      },
+      {
+        name: "Gabinete Gamer Mid Tower Mymax Ciclope Preto RGB USB 3.0 Vidro Temperado ATX",
+        slug: "gabinete-gamer-mid-tower-mymax-ciclope-preto",
+        description:
+          "Visual gamer com RGB, compatibilidade ampla e estrutura ideal para seu setup.\n\nCompatível com placas-mãe ATX, Micro ATX e ITX, proporciona flexibilidade para montagem de diferentes tipos de PCs.\n\nPrincipais características:\n• Formato Mid Tower com bom espaço interno\n• Painel frontal com iluminação LED RGB\n• Lateral em vidro temperado\n• Suporte para GPU de até 290mm",
+        imageUrls: [
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQiSycyJxBHNA0hmLyUxEvXgfZ5tVBRlp3C2cT1",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQijnaM4tvdGaiTJYxZI4ryh1UsPNwMS7p3ltgf",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQirbm1CNoOjN1tzFG5MaC0xs624iDwUfgLyhTW",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQiBgTk8BoEZf1n40vFXJqamlTDLQ59PjHzKdAy",
+        ],
+        basePrice: 340,
+        categoryId: gabinetesCategory.id,
+        discountPercentage: 10,
+      },
+    ];
+    await prisma.product.createMany({ data: gabinetes });
+
+    // ==========================================
+    // 6. ACESSÓRIOS (NOVOS)
+    // ==========================================
+    const acessoriosCategory = await prisma.category.create({
+      data: {
+        name: "Acessórios",
+        slug: "acessorios",
+        imageUrl:
+          "https://utfs.io/f/b73c526a-9e78-444e-8822-7cda6e857b9f-e7tkoj.png",
+      },
+    });
+
+    const acessorios = [
+      {
+        name: "Power Bank 10.000mAh Energizer UE10054 Carregador Portátil USB Duplo",
+        slug: "power-bank-10000mah-energizer-ue10054",
+        description:
+          "Energia portátil para o seu dia a dia com segurança e alta capacidade.\n\nO Power Bank Energizer UE10054 10.000mAh é a solução ideal para quem precisa de energia extra ao longo do dia. Permite carregar um smartphone padrão até três vezes.\n\nPrincipais características:\n• Capacidade de 10.000mAh\n• Duas saídas USB para carregar 2 dispositivos simultaneamente\n• Entrada dupla: USB-C e Micro USB\n• Indicador de bateria com 4 LEDs\n• Sistema de proteção PowerSafe",
+        imageUrls: [
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQip1RcMkeTDyaGSbhBUAnWXom9VeI0Nu1gKfJr",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQi1eFEZWRwtjXJWas3LTNDG8CgbQEVBZ4hk1UY",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQik2COkt6EH4nZ1yYw8bvKq7hdQ92JiGgeDcxM",
+          "https://v0cq2fbscu.ufs.sh/f/VcTSjbXMKqQiYso3IQj7kMaWHw7ERYnCo09ztrVqINdXQyKu",
+        ],
+        basePrice: 150,
+        categoryId: acessoriosCategory.id,
+        discountPercentage: 0,
+      },
+    ];
+    await prisma.product.createMany({ data: acessorios });
+
+    // ==========================================
+    // 7. MONITORES (100% ORIGINAIS)
+    // ==========================================
     const monitorsCategory = await prisma.category.create({
       data: {
         name: "Monitores",
@@ -436,7 +746,7 @@ async function main() {
         ],
         basePrice: 1500,
         categoryId: monitorsCategory.id,
-        discountPercentage: 15, // 10% discount
+        discountPercentage: 15,
       },
       {
         name: "Dell P2422H",
@@ -451,7 +761,7 @@ async function main() {
         ],
         basePrice: 2000,
         categoryId: monitorsCategory.id,
-        discountPercentage: 5, // 10% discount
+        discountPercentage: 5,
       },
       {
         name: "Dell P2723QE",
@@ -466,7 +776,7 @@ async function main() {
         ],
         basePrice: 2500,
         categoryId: monitorsCategory.id,
-        discountPercentage: 0, // 10% discount
+        discountPercentage: 0,
       },
       {
         name: "Dell S3422DWG",
@@ -481,7 +791,7 @@ async function main() {
         ],
         basePrice: 3200,
         categoryId: monitorsCategory.id,
-        discountPercentage: 0, // 10% discount
+        discountPercentage: 0,
       },
       {
         name: "Dell S3222DGM",
@@ -496,7 +806,7 @@ async function main() {
         ],
         basePrice: 3500,
         categoryId: monitorsCategory.id,
-        discountPercentage: 0, // 10% discount
+        discountPercentage: 0,
       },
       {
         name: "Dell AW2524HF",
@@ -511,14 +821,14 @@ async function main() {
         ],
         basePrice: 4200,
         categoryId: monitorsCategory.id,
-        discountPercentage: 10, // 10% discount
+        discountPercentage: 10,
       },
     ];
+    await prisma.product.createMany({ data: monitors });
 
-    await prisma.product.createMany({
-      data: monitors,
-    });
-
+    // ==========================================
+    // 8. SPEAKERS (100% ORIGINAIS)
+    // ==========================================
     const speakersCategory = await prisma.category.create({
       data: {
         name: "Speakers",
@@ -542,7 +852,7 @@ async function main() {
         ],
         basePrice: 1200,
         categoryId: speakersCategory.id,
-        discountPercentage: 5, // 10% discount
+        discountPercentage: 5,
       },
       {
         name: "Logitech Dock",
@@ -557,7 +867,7 @@ async function main() {
         ],
         basePrice: 4500,
         categoryId: speakersCategory.id,
-        discountPercentage: 15, // 10% discount
+        discountPercentage: 15,
       },
       {
         name: "Sony SA-Z9R Speakers",
@@ -572,7 +882,7 @@ async function main() {
         ],
         basePrice: 4000,
         categoryId: speakersCategory.id,
-        discountPercentage: 10, // 10% discount
+        discountPercentage: 10,
       },
       {
         name: "Sony XB43 Extra Bass",
@@ -587,7 +897,7 @@ async function main() {
         ],
         basePrice: 3200,
         categoryId: speakersCategory.id,
-        discountPercentage: 0, // 10% discount
+        discountPercentage: 0,
       },
       {
         name: "Sony XB23 Extra Bass",
@@ -602,7 +912,7 @@ async function main() {
         ],
         basePrice: 3500,
         categoryId: speakersCategory.id,
-        discountPercentage: 0, // 10% discount
+        discountPercentage: 0,
       },
       {
         name: "Sony HT-S200F Soundbar",
@@ -617,28 +927,23 @@ async function main() {
         ],
         basePrice: 2500,
         categoryId: speakersCategory.id,
-        discountPercentage: 0, // 10% discount
+        discountPercentage: 0,
       },
     ];
+    await prisma.product.createMany({ data: speakers });
 
-    await prisma.product.createMany({
-      data: speakers,
-    });
-
-    console.log("Seed completed successfully");
+    console.log(
+      "✅ Seed executado com sucesso! Todos os 100% dos seus produtos antigos e os novos foram adicionados.",
+    );
   } catch (error) {
-    console.error("Error seeding database:", error);
+    console.error("Erro rodando a seed:", error);
   } finally {
     await prisma.$disconnect();
   }
 }
 
-main()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.error(e);
-    await prisma.$disconnect();
-    process.exit(1);
-  });
+main().catch(async (e) => {
+  console.error(e);
+  await prisma.$disconnect();
+  process.exit(1);
+});

@@ -41,6 +41,7 @@ model Product {
 
 model Order {
   id            String         @id @default(uuid())
+  orderNumber   String         @unique
   userId        String
   user          User           @relation(fields: [userId], references: [id])
   orderProducts OrderProduct[]
@@ -58,6 +59,9 @@ model Order {
 enum OrderStatus {
   WAITING_FOR_PAYMENT
   PAYMENT_CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELED
 }
 
 model OrderProduct {

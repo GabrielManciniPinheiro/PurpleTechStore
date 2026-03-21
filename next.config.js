@@ -8,6 +8,10 @@ const nextConfig = {
         port: "",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "v0cq2fbscu.ufs.sh",
+      },
     ],
   },
   experimental: {

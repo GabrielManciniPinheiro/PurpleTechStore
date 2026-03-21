@@ -82,7 +82,7 @@ export default function SobrePage() {
             durabilidade.
           </p>
           <p>
-            Compromisso com o cliente: entender asnecessidades de cada pessoa
+            Compromisso com o cliente: entender as necessidades de cada pessoa
             para oferecer a melhor solução.
           </p>
           <p>

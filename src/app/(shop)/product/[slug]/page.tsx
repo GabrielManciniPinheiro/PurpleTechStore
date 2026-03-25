@@ -3,11 +3,10 @@ import ProductImages from "./components/product-images";
 import ProductInfo from "./components/product-info";
 import { computeProductTotalPrice } from "@/helpers/product";
 import SectionTitle from "@/components/ui/section-title";
-
-// 👇 IMPORTANTE: Trocamos o import do ProductList pelo seu ProductCarousel
 import ProductCarousel from "@/components/ui/product-carousel";
 
 export const revalidate = 0;
+
 interface ProductDetailsPageProps {
   params: {
     slug: string;
@@ -39,9 +38,13 @@ const ProductDetailsPage = async ({
     },
   });
 
-  console.log(product);
-
   if (!product) return null;
+
+  // 👇 PROCESSAMENTO DA LISTA: Injetamos o totalPrice em cada produto recomendado
+  const recommendedProducts = product.category?.products.map((p) => ({
+    ...p,
+    totalPrice: computeProductTotalPrice(p as any),
+  }));
 
   return (
     <div className="flex flex-col gap-8 pb-8 lg:container lg:mx-auto lg:gap-10 lg:py-10">
@@ -55,11 +58,12 @@ const ProductDetailsPage = async ({
         />
       </div>
 
-      {product.category && (
+      {product.category && recommendedProducts && (
         <div className="flex flex-col gap-5">
           <ProductCarousel
             title="Produtos Recomendados"
-            products={product.category.products as any}
+            // Mandamos a lista processada e com os preços calculados para o carrossel
+            products={recommendedProducts as any}
           />
         </div>
       )}

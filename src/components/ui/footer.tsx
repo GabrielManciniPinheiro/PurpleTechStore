@@ -5,6 +5,7 @@ import {
   PhoneIcon,
   ShieldCheckIcon,
   SmartphoneNfcIcon,
+  BarcodeIcon, // 👇 Ícone novo para o Boleto
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -15,7 +16,7 @@ const Footer = () => {
     <footer className="w-full border-t border-zinc-800 bg-zinc-950 pt-10 text-white">
       <div className="mx-auto flex max-w-[1920px] flex-col gap-10 px-5 md:px-[1.875rem] lg:flex-row lg:justify-between lg:gap-20">
         {/* Coluna 1: Marca e Confiança */}
-        <div className="flex flex-col gap-4 lg:w-1/3">
+        <div className="flex flex-col gap-4 lg:w-1/4">
           <Link href="/" className="flex items-center gap-3">
             <Image
               src="/PurpleTechLogo.png"
@@ -39,8 +40,8 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Coluna 2: Institucional & Suporte */}
-        <div className="flex flex-col gap-8 sm:flex-row lg:w-2/3 lg:justify-around">
+        {/* Coluna 2: Links e Pagamentos */}
+        <div className="flex flex-col gap-8 sm:flex-row sm:flex-wrap lg:w-3/4 lg:justify-between">
           {/* Fale Conosco */}
           <div className="flex flex-col gap-4">
             <h3 className="font-bold uppercase tracking-wider text-zinc-100">
@@ -51,7 +52,7 @@ const Footer = () => {
                 href="mailto:suporte@purpletech.com.br"
                 className="flex items-center gap-2 transition-colors hover:text-primary"
               >
-                <MailIcon size={16} /> suporte@purpletech.com.br
+                <MailIcon size={16} /> suporte.purpletechstore@gmail.com.br
               </a>
               <a
                 href="#"
@@ -67,6 +68,33 @@ const Footer = () => {
                   São Paulo - SP, 01310-100
                 </span>
               </div>
+            </div>
+          </div>
+
+          {/* 👇 NOVA COLUNA: Mundo Tech (Blog) */}
+          <div className="flex flex-col gap-4">
+            <h3 className="font-bold uppercase tracking-wider text-zinc-100">
+              Purple Blog
+            </h3>
+            <div className="flex flex-col gap-3 text-sm text-zinc-400">
+              <Link
+                href="/blog/reviews"
+                className="transition-colors hover:text-primary"
+              >
+                Reviews de Setup
+              </Link>
+              <Link
+                href="/blog/guias"
+                className="transition-colors hover:text-primary"
+              >
+                Guias de Compra
+              </Link>
+              <Link
+                href="/blog/top-5-2026"
+                className="transition-colors hover:text-primary"
+              >
+                Como funcionam os Hz de um monitor?
+              </Link>
             </div>
           </div>
 
@@ -103,19 +131,32 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Formas de Pagamento (Usando Ícones Nativos) */}
+          {/* 👇 Formas de Pagamento - Padronizado com o resto do Footer */}
           <div className="flex flex-col gap-4">
             <h3 className="font-bold uppercase tracking-wider text-zinc-100">
               Pagamento
             </h3>
-            <div className="flex gap-4 text-zinc-400">
-              <div className="flex flex-col items-center gap-1">
-                <CreditCardIcon size={32} />
-                <span className="text-[10px] uppercase">Crédito | Débito </span>
+            {/* Lista vertical, seguindo a mesma estrutura das outras colunas */}
+            <div className="flex flex-col gap-3 text-sm text-zinc-400">
+              <div className="flex items-center gap-3">
+                <CreditCardIcon size={20} className="shrink-0 text-zinc-100" />
+                <span>Cartão de Crédito</span>
               </div>
-              <div className="flex flex-col items-center gap-1">
-                <SmartphoneNfcIcon size={32} />
-                <span className="text-[10px] uppercase">Pix</span>
+              <div className="flex items-center gap-3">
+                {/* Reutilizando o ícone, mas você pode usar o SmartphoneNfcIcon se preferir */}
+                <CreditCardIcon size={20} className="shrink-0 text-zinc-100" />
+                <span>Cartão de Débito</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <SmartphoneNfcIcon
+                  size={20}
+                  className="shrink-0 text-zinc-100"
+                />
+                <span>Pix</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <BarcodeIcon size={20} className="shrink-0 text-zinc-100" />
+                <span>Boleto Bancário</span>
               </div>
             </div>
           </div>

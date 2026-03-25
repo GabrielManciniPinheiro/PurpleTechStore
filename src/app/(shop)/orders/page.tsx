@@ -23,6 +23,10 @@ async function OrderPage() {
     where: {
       userId: session.user.id,
     },
+    // 👇 A MÁGICA ACONTECE AQUI: Ordenando do mais novo para o mais antigo
+    orderBy: {
+      createdAt: "desc",
+    },
     include: {
       orderProducts: {
         include: {
@@ -40,9 +44,19 @@ async function OrderPage() {
       </Badge>
 
       <div className="mt-5 flex flex-col gap-5">
-        {orders.map((order) => (
-          <OrderItem key={order.id} order={order} />
-        ))}
+        {orders.length > 0 ? (
+          orders.map((order) => <OrderItem key={order.id} order={order} />)
+        ) : (
+          // 👇 Aproveitei para adicionar um feedback caso ele não tenha pedidos
+          <div className="mt-10 flex flex-col items-center justify-center gap-2">
+            <h3 className="text-lg font-bold text-zinc-100">
+              Nenhum pedido encontrado.
+            </h3>
+            <p className="text-sm text-zinc-400">
+              Você ainda não realizou nenhuma compra na loja.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -7,10 +7,14 @@ export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prismaClient),
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     }),
   ],
+  // 👇 O PULO DO GATO: Aqui dizemos para o NextAuth usar a nossa tela customizada!
+  pages: {
+    signIn: "/login",
+  },
   callbacks: {
     async session({ session, token, user }) {
       session.user = { ...session.user, id: user.id } as {

@@ -33,8 +33,9 @@ const OrderItem = ({ order }: OrderItemProps) => {
 
   const total = useMemo(() => {
     return order.orderProducts.reduce((acc, product) => {
-      const productTotalPrice = computeProductTotalPrice(product.product);
-
+      const productTotalPrice = computeProductTotalPrice(
+        product.product as any,
+      );
       return acc + productTotalPrice * product.quantity;
     }, 0);
   }, [order.orderProducts]);
@@ -47,9 +48,13 @@ const OrderItem = ({ order }: OrderItemProps) => {
         <AccordionItem value={order.id}>
           <AccordionTrigger>
             <div className="flex w-full text-left">
-              <div className="flex flex-1 flex-col gap-1 text-left">
-                <p className="text-sm font-bold uppercase lg:text-base">
-                  Pedido com {order.orderProducts.length} produto(s)
+              <div className="flex flex-[2] flex-col gap-1 text-left">
+                {/* 👇 Exibindo o Número do Pedido com destaque */}
+                <p className="text-lg font-bold uppercase text-[#8162FF]">
+                  Pedido #{order.orderNumber || "S/N"}
+                </p>
+                <p className="text-sm font-semibold uppercase lg:text-base">
+                  {order.orderProducts.length} produto(s)
                 </p>
                 <span className="text-xs opacity-60">
                   Feito em{" "}
@@ -85,10 +90,7 @@ const OrderItem = ({ order }: OrderItemProps) => {
                 </p>
               </div>
 
-              <div className="hidden flex-1 lg:block">
-                <p className="text-xs font-bold lg:text-sm">Pagamento</p>
-                <p className="text-xs opacity-60 lg:text-sm">Cartão</p>
-              </div>
+              {/* Removi o "Pagamento Cartão" fixo, pois agora temos PIX e Boleto também */}
             </div>
           </AccordionTrigger>
 
@@ -112,11 +114,6 @@ const OrderItem = ({ order }: OrderItemProps) => {
                       year: "numeric",
                     }).format(order.createdAt)}
                   </p>
-                </div>
-
-                <div>
-                  <p className="text-xs font-bold lg:text-sm">Pagamento</p>
-                  <p className="text-xs opacity-60 lg:text-sm">Cartão</p>
                 </div>
               </div>
 

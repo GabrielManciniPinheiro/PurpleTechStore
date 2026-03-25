@@ -42,7 +42,7 @@ export const createOrder = async (
     return acc + finalPrice * product.quantity;
   }, 0);
 
-  const generatedOrderNumber = `PT-${Math.floor(1000 + Math.random() * 9000)}`;
+  const generatedOrderNumber = `${Math.floor(1000 + Math.random() * 9000)}`;
 
   const order = await prismaClient.order.create({
     data: {

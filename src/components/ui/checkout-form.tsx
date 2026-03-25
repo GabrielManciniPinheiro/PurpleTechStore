@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { CartContext } from "@/providers/cart";
 import {
@@ -18,6 +18,8 @@ import {
   ClockIcon,
   MapPinIcon,
   CreditCardIcon,
+  FileTextIcon,
+  CheckCircle2Icon,
 } from "lucide-react";
 
 interface CheckoutFormProps {
@@ -27,17 +29,20 @@ interface CheckoutFormProps {
 const CheckoutForm = ({ userId }: CheckoutFormProps) => {
   const { products, clearCart, total } = useContext(CartContext);
 
-  const [paymentMethod, setPaymentMethod] = useState<"PIX" | "CREDIT_CARD">(
-    "PIX",
-  );
+  const [paymentMethod, setPaymentMethod] = useState<
+    "PIX" | "CREDIT_CARD" | "BOLETO"
+  >("PIX");
   const [cpf, setCpf] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Cartão
   const [cardName, setCardName] = useState("");
   const [cardNumber, setCardNumber] = useState("");
   const [cardExpiry, setCardExpiry] = useState("");
   const [cardCcv, setCardCcv] = useState("");
+  const [installments, setInstallments] = useState(1); // 👇 Estado das parcelas
 
+  // Endereço
   const [cep, setCep] = useState("");
   const [street, setStreet] = useState("");
   const [number, setNumber] = useState("");
@@ -47,13 +52,30 @@ const CheckoutForm = ({ userId }: CheckoutFormProps) => {
   const [state, setState] = useState("");
   const [isFetchingCep, setIsFetchingCep] = useState(false);
 
+  // Respostas de Pagamento
   const [pixData, setPixData] = useState<{
     qrCode: string;
     copyPaste: string;
   } | null>(null);
+  const [boletoUrl, setBoletoUrl] = useState<string | null>(null); // 👇 Estado do Boleto
+
   const [paymentId, setPaymentId] = useState<string | null>(null);
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState(900);
+
+  // 👇 REGRA DE NEGÓCIO DAS PARCELAS
+  const maxInstallments = useMemo(() => {
+    if (total > 200) return 12;
+    if (total >= 100) return 6;
+    return 2;
+  }, [total]);
+
+  // Se o total mudar (tirou algo do carrinho) e a parcela escolhida ficar maior que o permitido, reseta pra 1
+  useEffect(() => {
+    if (installments > maxInstallments) {
+      setInstallments(1);
+    }
+  }, [maxInstallments, installments]);
 
   const handleCpfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value.replace(/\D/g, "");
@@ -133,13 +155,13 @@ const CheckoutForm = ({ userId }: CheckoutFormProps) => {
   }, [pixData, timeLeft]);
 
   useEffect(() => {
-    if (timeLeft === 0 && createdOrderId) {
+    if (timeLeft === 0 && createdOrderId && paymentMethod === "PIX") {
       cancelOrder(createdOrderId).then(() => {
         clearCart();
         window.location.href = "/order/cancelled";
       });
     }
-  }, [timeLeft, createdOrderId, clearCart]);
+  }, [timeLeft, createdOrderId, clearCart, paymentMethod]);
 
   const handleCheckout = async () => {
     if (!cep || !street || !number || !city || !state || !cpf) {
@@ -193,6 +215,7 @@ const CheckoutForm = ({ userId }: CheckoutFormProps) => {
           state,
           zipCode: cep,
         },
+        installments, // 👇 Envia o número de parcelas
       );
 
       setCreatedOrderId(response.orderId);
@@ -203,12 +226,15 @@ const CheckoutForm = ({ userId }: CheckoutFormProps) => {
           copyPaste: response.pixCopyAndPaste || "",
         });
         setPaymentId(response.paymentId);
+      } else if (response.paymentMethod === "BOLETO" && response.bankSlipUrl) {
+        setBoletoUrl(response.bankSlipUrl);
+        // Não limpamos o carrinho aqui ainda para o usuário poder clicar no link
       } else if (response.paymentMethod === "CREDIT_CARD") {
         clearCart();
         window.location.href = "/order/success";
       }
     } catch (error) {
-      alert("Ops! Ocorreu um erro. Verifique seus dados do cartão ou CPF.");
+      alert("Ops! Ocorreu um erro. Verifique seus dados de pagamento ou CPF.");
     } finally {
       setLoading(false);
     }
@@ -221,14 +247,20 @@ const CheckoutForm = ({ userId }: CheckoutFormProps) => {
     }
   };
 
-  const minutes = Math.floor(timeLeft / 60);
-  const seconds = timeLeft % 60;
-  const formattedTime = `${String(minutes).padStart(2, "0")}:${String(
-    seconds,
-  ).padStart(2, "0")}`;
-  const timerColor = timeLeft < 60 ? "text-red-500" : "text-[#8162FF]";
+  const handleBoletoFinish = () => {
+    clearCart();
+    window.location.href = "/order/success";
+  };
 
+  // TELA DE SUCESSO PIX
   if (pixData) {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    const formattedTime = `${String(minutes).padStart(2, "0")}:${String(
+      seconds,
+    ).padStart(2, "0")}`;
+    const timerColor = timeLeft < 60 ? "text-red-500" : "text-[#8162FF]";
+
     return (
       <div className="flex flex-col items-center gap-5 rounded-lg border border-gray-800 bg-[#121214] p-8 text-white">
         <h3 className="text-xl font-bold text-[#8162FF]">Pague com PIX</h3>
@@ -253,6 +285,39 @@ const CheckoutForm = ({ userId }: CheckoutFormProps) => {
           className="mt-2 w-full bg-[#8162FF] font-bold hover:bg-[#6b4ce6]"
         >
           <CopyIcon className="mr-2 h-4 w-4" /> Copiar código PIX
+        </Button>
+      </div>
+    );
+  }
+
+  // TELA DE SUCESSO BOLETO
+  if (boletoUrl) {
+    return (
+      <div className="flex flex-col items-center gap-6 rounded-lg border border-gray-800 bg-[#121214] p-8 text-center text-white">
+        <CheckCircle2Icon className="h-16 w-16 text-[#8162FF]" />
+        <div>
+          <h3 className="text-xl font-bold">Boleto Gerado!</h3>
+          <p className="mt-2 text-sm text-gray-400">
+            Seu pedido foi reservado. O pagamento pode levar até 2 dias úteis
+            para ser compensado após o pagamento.
+          </p>
+        </div>
+
+        <Button
+          asChild
+          className="w-full border border-gray-700 bg-[#1A1A1E] font-bold hover:bg-gray-800"
+        >
+          <a href={boletoUrl} target="_blank" rel="noopener noreferrer">
+            <FileTextIcon className="mr-2 h-4 w-4 text-[#8162FF]" />{" "}
+            Acessar/Imprimir Boleto
+          </a>
+        </Button>
+
+        <Button
+          onClick={handleBoletoFinish}
+          className="w-full bg-[#8162FF] font-bold hover:bg-[#6b4ce6]"
+        >
+          Concluir Pedido
         </Button>
       </div>
     );
@@ -356,7 +421,8 @@ const CheckoutForm = ({ userId }: CheckoutFormProps) => {
           <h2 className="text-lg font-bold">Pagamento</h2>
         </div>
 
-        <div className="flex gap-4">
+        {/* 👇 Botões de Pagamento Atualizados */}
+        <div className="flex gap-2">
           <Button
             variant={paymentMethod === "PIX" ? "default" : "outline"}
             onClick={() => setPaymentMethod("PIX")}
@@ -378,6 +444,17 @@ const CheckoutForm = ({ userId }: CheckoutFormProps) => {
             }`}
           >
             Cartão
+          </Button>
+          <Button
+            variant={paymentMethod === "BOLETO" ? "default" : "outline"}
+            onClick={() => setPaymentMethod("BOLETO")}
+            className={`flex-1 ${
+              paymentMethod === "BOLETO"
+                ? "bg-[#8162FF] text-white hover:bg-[#6b4ce6]"
+                : "border-gray-700 text-gray-400"
+            }`}
+          >
+            Boleto
           </Button>
         </div>
 
@@ -438,6 +515,29 @@ const CheckoutForm = ({ userId }: CheckoutFormProps) => {
                   className="border-gray-700 bg-transparent focus-visible:ring-[#8162FF]"
                 />
               </div>
+            </div>
+
+            {/* 👇 Dropdown de Parcelas */}
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-300">
+                Parcelamento
+              </label>
+              <select
+                value={installments}
+                onChange={(e) => setInstallments(Number(e.target.value))}
+                className="flex h-10 w-full rounded-md border border-gray-700 bg-transparent px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#8162FF]"
+              >
+                {Array.from({ length: maxInstallments }).map((_, i) => (
+                  <option
+                    key={i + 1}
+                    value={i + 1}
+                    className="bg-[#121214] text-white"
+                  >
+                    {i + 1}x de R$ {(total / (i + 1)).toFixed(2)}{" "}
+                    {i === 0 ? "à vista" : "sem juros"}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         )}

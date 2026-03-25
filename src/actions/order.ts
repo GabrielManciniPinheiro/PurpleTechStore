@@ -24,10 +24,11 @@ export interface ShippingAddress {
 export const createOrder = async (
   cartProducts: OrderProductPayload[],
   userId: string,
-  paymentMethod: "PIX" | "CREDIT_CARD",
+  paymentMethod: "PIX" | "CREDIT_CARD" | "BOLETO", // 👇 Boleto incluído
   customerCpf: string,
   creditCard?: CreditCardInfo,
   shippingAddress?: ShippingAddress,
+  installmentCount?: number, // 👇 Parcelas incluídas
 ) => {
   const user = await prismaClient.user.findUnique({
     where: { id: userId },
@@ -76,6 +77,7 @@ export const createOrder = async (
     },
     creditCard,
     shippingAddress,
+    installmentCount,
   );
 
   if (
@@ -95,6 +97,7 @@ export const createOrder = async (
     paymentMethod,
     pixQrCodeBase64: paymentResult.qrCodeBase64,
     pixCopyAndPaste: paymentResult.copyAndPaste,
+    bankSlipUrl: paymentResult.bankSlipUrl, // Envia para o form
   };
 };
 

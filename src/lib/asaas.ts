@@ -13,16 +13,18 @@ export interface PaymentResult {
   paymentId: string;
   qrCodeBase64?: string;
   copyAndPaste?: string;
+  bankSlipUrl?: string; // 👇 Adicionado para retornar o link do Boleto
   status?: string;
 }
 
 export const processAsaasPayment = async (
   orderId: string,
   totalValue: number,
-  billingType: "PIX" | "CREDIT_CARD",
+  billingType: "PIX" | "CREDIT_CARD" | "BOLETO", // 👇 Boleto incluído
   customerData: { name: string; email: string; cpfCnpj: string },
   creditCard?: CreditCardInfo,
   shippingAddress?: { zipCode: string; address: string },
+  installmentCount?: number, // 👇 Adicionado para receber as parcelas
 ): Promise<PaymentResult> => {
   const headers = {
     access_token: API_KEY,
@@ -41,17 +43,27 @@ export const processAsaasPayment = async (
 
   const customer = await customerResponse.json();
 
-  if (!customerResponse.ok) throw new Error("Erro ao criar cliente no Asaas");
+  if (!customerResponse.ok) {
+    console.error("🔴 ERRO DETALHADO DO ASAAS (Cliente):", customer);
+    throw new Error("Erro ao criar cliente no Asaas");
+  }
+
+  // 👇 Configura o vencimento: Boleto ganha 3 dias, Pix/Cartão vencem hoje
+  const dueDate = new Date();
+  if (billingType === "BOLETO") {
+    dueDate.setDate(dueDate.getDate() + 3);
+  }
 
   const paymentPayload: Record<string, unknown> = {
     customer: customer.id,
     billingType: billingType,
     value: totalValue,
-    dueDate: new Date().toISOString().split("T")[0],
+    dueDate: dueDate.toISOString().split("T")[0],
     description: `Pedido ${orderId} - PurpleTech Store`,
     externalReference: orderId,
   };
 
+  // 👇 Lógica do Cartão de Crédito COM PARCELAMENTO
   if (billingType === "CREDIT_CARD" && creditCard) {
     paymentPayload.creditCard = creditCard;
     paymentPayload.creditCardHolderInfo = {
@@ -62,6 +74,14 @@ export const processAsaasPayment = async (
       addressNumber: "SN",
       phone: "11999999999",
     };
+
+    // Se o cliente escolheu parcelar, o Asaas exige a quantidade e o valor exato da parcela
+    if (installmentCount && installmentCount > 1) {
+      paymentPayload.installmentCount = installmentCount;
+      paymentPayload.installmentValue = Number(
+        (totalValue / installmentCount).toFixed(2),
+      );
+    }
   }
 
   const paymentResponse = await fetch(`${API_URL}/payments`, {
@@ -72,7 +92,10 @@ export const processAsaasPayment = async (
 
   const payment = await paymentResponse.json();
 
-  if (!paymentResponse.ok) throw new Error("Erro ao gerar cobrança no Asaas");
+  if (!paymentResponse.ok) {
+    console.error("🔴 ERRO DETALHADO DO ASAAS (Pagamento):", payment);
+    throw new Error("Erro ao gerar cobrança no Asaas");
+  }
 
   if (billingType === "PIX") {
     const qrCodeResponse = await fetch(
@@ -86,6 +109,15 @@ export const processAsaasPayment = async (
       paymentId: payment.id,
       qrCodeBase64: qrCodeData.encodedImage,
       copyAndPaste: qrCodeData.payload,
+    };
+  }
+
+  // 👇 Retorna a URL do Boleto se esse for o método escolhido
+  if (billingType === "BOLETO") {
+    return {
+      paymentId: payment.id,
+      bankSlipUrl: payment.bankSlipUrl,
+      status: payment.status,
     };
   }
 

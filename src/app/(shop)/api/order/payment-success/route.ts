@@ -1,60 +1,55 @@
 import { prismaClient } from "@/lib/prisma";
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: "2026-02-25.clover",
-});
+interface AsaasWebhookPayload {
+  event: string;
+  payment: {
+    id: string;
+    externalReference?: string;
+    status: string;
+  };
+}
 
 export const POST = async (request: Request) => {
-  const signature = request.headers.get("stripe-signature");
-
-  if (!signature) {
-    return NextResponse.error();
-  }
-
-  const text = await request.text();
-
-  let event;
   try {
-    event = stripe.webhooks.constructEvent(
-      text,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET_KEY as string,
-    );
+    // 🛡️ O SEGURANÇA DA BALADA: Verifica se o token do Asaas é o mesmo da Vercel
+    const asaasToken = request.headers.get("asaas-access-token");
+    const mySecretToken = process.env.ASAAS_WEBHOOK_TOKEN;
+
+    if (!mySecretToken || asaasToken !== mySecretToken) {
+      console.error(
+        "🔴 Bloqueado: Tentativa de acesso sem token válido no Webhook!",
+      );
+      return NextResponse.json({ error: "Acesso Negado" }, { status: 401 });
+    }
+
+    // 1. Recebe o payload do Asaas (agora sabemos que é seguro)
+    const body = (await request.json()) as AsaasWebhookPayload;
+    const { event, payment } = body;
+
+    // 2. Se não vier o número do pedido (externalReference), a gente ignora
+    if (!payment?.externalReference) {
+      return NextResponse.json({ message: "Ignorado" }, { status: 200 });
+    }
+
+    const orderId = payment.externalReference;
+
+    // 3. Atualiza o banco de dados se o dinheiro caiu
+    if (event === "PAYMENT_RECEIVED" || event === "PAYMENT_CONFIRMED") {
+      await prismaClient.order.update({
+        where: { id: orderId },
+        data: { status: "PAYMENT_CONFIRMED" },
+      });
+      console.log(`✅ Webhook Asaas: Pedido ${orderId} atualizado para PAGO!`);
+    }
+
+    // 4. Responde pro Asaas que deu tudo certo
+    return NextResponse.json({ received: true }, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ error: "Webhook Error" }, { status: 400 });
+    console.error("🔴 Erro no Webhook Asaas:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
-
-  if (event.type === "checkout.session.completed") {
-    // Usando 'any' para o TypeScript não encher o saco
-    const session = event.data.object as any;
-
-    // 📦 Pega o endereço de Entrega. Se vier vazio, pega o de Cobrança.
-    const addressData =
-      session.shipping_details?.address || session.customer_details?.address;
-
-    // Montando a rua + número + complemento (se houver)
-    const fullAddress = addressData?.line1
-      ? `${addressData.line1}${
-          addressData.line2 ? ` - ${addressData.line2}` : ""
-        }`
-      : null;
-
-    // ATUALIZAR PEDIDO COM STATUS E ENDEREÇO
-    await prismaClient.order.update({
-      where: {
-        id: session.metadata.orderId,
-      },
-      data: {
-        status: "PAYMENT_CONFIRMED",
-        address: fullAddress,
-        city: addressData?.city || null,
-        state: addressData?.state || null,
-        zipCode: addressData?.postal_code || null,
-      },
-    });
-  }
-
-  return NextResponse.json({ received: true });
 };

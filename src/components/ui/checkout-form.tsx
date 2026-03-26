@@ -22,6 +22,9 @@ import {
   CheckCircle2Icon,
 } from "lucide-react";
 
+// 👇 Importando o toast
+import toast from "react-hot-toast";
+
 interface CheckoutFormProps {
   userId: string;
 }
@@ -40,7 +43,7 @@ const CheckoutForm = ({ userId }: CheckoutFormProps) => {
   const [cardNumber, setCardNumber] = useState("");
   const [cardExpiry, setCardExpiry] = useState("");
   const [cardCcv, setCardCcv] = useState("");
-  const [installments, setInstallments] = useState(1); // 👇 Estado das parcelas
+  const [installments, setInstallments] = useState(1);
 
   // Endereço
   const [cep, setCep] = useState("");
@@ -57,20 +60,20 @@ const CheckoutForm = ({ userId }: CheckoutFormProps) => {
     qrCode: string;
     copyPaste: string;
   } | null>(null);
-  const [boletoUrl, setBoletoUrl] = useState<string | null>(null); // 👇 Estado do Boleto
+  const [boletoUrl, setBoletoUrl] = useState<string | null>(null);
 
   const [paymentId, setPaymentId] = useState<string | null>(null);
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState(900);
 
-  // 👇 REGRA DE NEGÓCIO DAS PARCELAS
+  // REGRA DE NEGÓCIO DAS PARCELAS
   const maxInstallments = useMemo(() => {
     if (total > 200) return 12;
     if (total >= 100) return 6;
     return 2;
   }, [total]);
 
-  // Se o total mudar (tirou algo do carrinho) e a parcela escolhida ficar maior que o permitido, reseta pra 1
+  // Se o total mudar e a parcela escolhida ficar maior que o permitido, reseta pra 1
   useEffect(() => {
     if (installments > maxInstallments) {
       setInstallments(1);
@@ -165,7 +168,8 @@ const CheckoutForm = ({ userId }: CheckoutFormProps) => {
 
   const handleCheckout = async () => {
     if (!cep || !street || !number || !city || !state || !cpf) {
-      alert(
+      // 👇 Trocando o alert nativo pelo toast de erro
+      toast.error(
         "Por favor, preencha todos os campos obrigatórios (Endereço e CPF).",
       );
       return;
@@ -215,7 +219,7 @@ const CheckoutForm = ({ userId }: CheckoutFormProps) => {
           state,
           zipCode: cep,
         },
-        installments, // 👇 Envia o número de parcelas
+        installments,
       );
 
       setCreatedOrderId(response.orderId);
@@ -228,13 +232,15 @@ const CheckoutForm = ({ userId }: CheckoutFormProps) => {
         setPaymentId(response.paymentId);
       } else if (response.paymentMethod === "BOLETO" && response.bankSlipUrl) {
         setBoletoUrl(response.bankSlipUrl);
-        // Não limpamos o carrinho aqui ainda para o usuário poder clicar no link
       } else if (response.paymentMethod === "CREDIT_CARD") {
         clearCart();
         window.location.href = "/order/success";
       }
     } catch (error) {
-      alert("Ops! Ocorreu um erro. Verifique seus dados de pagamento ou CPF.");
+      // 👇 Trocando o alert nativo pelo toast de erro
+      toast.error(
+        "Ops! Ocorreu um erro. Verifique seus dados de pagamento ou CPF.",
+      );
     } finally {
       setLoading(false);
     }
@@ -243,7 +249,8 @@ const CheckoutForm = ({ userId }: CheckoutFormProps) => {
   const handleCopyPix = () => {
     if (pixData) {
       navigator.clipboard.writeText(pixData.copyPaste);
-      alert("Chave PIX copiada!");
+      // 👇 Trocando o alert nativo pelo toast de sucesso
+      toast.success("Chave PIX copiada com sucesso!");
     }
   };
 
@@ -421,7 +428,6 @@ const CheckoutForm = ({ userId }: CheckoutFormProps) => {
           <h2 className="text-lg font-bold">Pagamento</h2>
         </div>
 
-        {/* 👇 Botões de Pagamento Atualizados */}
         <div className="flex gap-2">
           <Button
             variant={paymentMethod === "PIX" ? "default" : "outline"}
@@ -517,7 +523,6 @@ const CheckoutForm = ({ userId }: CheckoutFormProps) => {
               </div>
             </div>
 
-            {/* 👇 Dropdown de Parcelas */}
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-300">
                 Parcelamento

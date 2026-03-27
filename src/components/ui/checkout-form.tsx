@@ -22,8 +22,10 @@ import {
   CheckCircle2Icon,
 } from "lucide-react";
 
-// 👇 Importando o toast
 import toast from "react-hot-toast";
+
+// 👇 Importando o disparador de eventos do Google Analytics
+import { sendGAEvent } from "@next/third-parties/google";
 
 interface CheckoutFormProps {
   userId: string;
@@ -168,7 +170,6 @@ const CheckoutForm = ({ userId }: CheckoutFormProps) => {
 
   const handleCheckout = async () => {
     if (!cep || !street || !number || !city || !state || !cpf) {
-      // 👇 Trocando o alert nativo pelo toast de erro
       toast.error(
         "Por favor, preencha todos os campos obrigatórios (Endereço e CPF).",
       );
@@ -224,6 +225,23 @@ const CheckoutForm = ({ userId }: CheckoutFormProps) => {
 
       setCreatedOrderId(response.orderId);
 
+      // 👇 Disparo do Evento de Compra para o Google Analytics GA4
+      sendGAEvent("event", "purchase", {
+        transaction_id: response.orderId,
+        value: total,
+        currency: "BRL",
+        items: products.map((p) => ({
+          item_id: p.id,
+          // Verifica se p.name existe (caso tenha no context), se não manda genérico com o ID
+          item_name: (p as any).name || `Produto ${p.id}`,
+          price:
+            typeof p.basePrice === "object"
+              ? Number(p.basePrice.toString())
+              : Number(p.basePrice),
+          quantity: p.quantity,
+        })),
+      });
+
       if (response.paymentMethod === "PIX" && response.pixQrCodeBase64) {
         setPixData({
           qrCode: response.pixQrCodeBase64,
@@ -237,7 +255,6 @@ const CheckoutForm = ({ userId }: CheckoutFormProps) => {
         window.location.href = "/order/success";
       }
     } catch (error) {
-      // 👇 Trocando o alert nativo pelo toast de erro
       toast.error(
         "Ops! Ocorreu um erro. Verifique seus dados de pagamento ou CPF.",
       );
@@ -249,7 +266,6 @@ const CheckoutForm = ({ userId }: CheckoutFormProps) => {
   const handleCopyPix = () => {
     if (pixData) {
       navigator.clipboard.writeText(pixData.copyPaste);
-      // 👇 Trocando o alert nativo pelo toast de sucesso
       toast.success("Chave PIX copiada com sucesso!");
     }
   };

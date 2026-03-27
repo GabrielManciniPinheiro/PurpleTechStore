@@ -6,8 +6,10 @@ import { AuthProvider } from "@/providers/auth";
 import Footer from "@/components/ui/footer";
 import CartProvider from "@/providers/cart";
 
-// 👇 Substituímos o Sonner pelo React Hot Toast
+// O Toaster que configuramos
 import { Toaster } from "react-hot-toast";
+// 👇 A importação NOVA do Google Analytics
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ptbr">
+    <html lang="pt-BR">
       <body className={inter.className}>
         <div className="flex h-full flex-col">
           <AuthProvider>
@@ -30,7 +32,7 @@ export default function RootLayout({
               <Header />
               <div className="flex-1">{children}</div>
 
-              {/* 👇 Toaster estilizado com a paleta da PurpleTech */}
+              {/* Toaster estilizado com a paleta da PurpleTech */}
               <Toaster
                 position="bottom-right"
                 toastOptions={{
@@ -58,6 +60,11 @@ export default function RootLayout({
             </CartProvider>
           </AuthProvider>
         </div>
+
+        {/* 👇 Injetando o Analytics no final do body! */}
+        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
+        )}
       </body>
     </html>
   );

@@ -86,7 +86,7 @@ const AdminDashboardPage = async () => {
 
         {/* Card de Produtos */}
         <div className="flex flex-col gap-2 rounded-xl border border-zinc-800 bg-[#0A0A0A] p-6 shadow-lg">
-          <div className="flex items-center gap-2 text-blue-400">
+          <div className="flex items-center gap-2  text-[#8162FF]">
             <PackageIcon size={20} />
             <h3 className="font-semibold uppercase tracking-wider">
               Produtos Ativos

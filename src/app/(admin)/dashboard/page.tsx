@@ -102,7 +102,7 @@ const AdminDashboardPage = async () => {
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-white">Últimos Pedidos</h2>
           <Link
-            href="/orders" // Ajuste para a rota onde fica a lista completa do admin
+            href="/dashboard/orders" // Ajuste para a rota onde fica a lista completa do admin
             className="flex items-center gap-1 text-sm font-semibold text-[#8162FF] hover:underline"
           >
             Ver todos <ArrowRightIcon size={16} />

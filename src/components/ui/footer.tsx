@@ -90,7 +90,7 @@ const Footer = () => {
                 Guias de Compra
               </Link>
               <Link
-                href="/blog/top-5-2026"
+                href="/blog/hz-do-monitor"
                 className="transition-colors hover:text-primary"
               >
                 Como funcionam os Hz de um monitor?

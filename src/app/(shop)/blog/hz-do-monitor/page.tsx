@@ -16,11 +16,11 @@ const MonitorHzArticlePage = () => {
       {/* Botão de Voltar */}
       <div className="mb-8 w-full max-w-3xl">
         <Link
-          href="/blog"
+          href="/"
           className="flex w-fit items-center gap-2 text-sm text-zinc-400 transition-colors hover:text-[#8162FF]"
         >
           <ArrowLeftIcon size={16} />
-          Voltar para o Blog
+          Voltar para o inicio
         </Link>
       </div>
 
